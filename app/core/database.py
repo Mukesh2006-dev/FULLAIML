@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker,declarative_base
+from app.core.config import settings
 
-DATABASE_URL = "postgresql://postgres:Mukesh19#@localhost/FULLAIML"
+
+DATABASE_URL=settings.database_url
 
 engine=create_engine(DATABASE_URL)
 
@@ -12,3 +14,10 @@ SessionLocal=sessionmaker(
 )
 
 Base=declarative_base()
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
