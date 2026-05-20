@@ -59,5 +59,11 @@ app/
  ├── workers/
  └── main.py
 
+
+## Features devlopment
 1.First feature devlopment 
-Au
+User Authentication Feature
+
+Users can:
+register account
+login securely
