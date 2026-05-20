@@ -1,26 +1,28 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.database import Base, engine
+
 from app.models.user import User
 from app.models.dataset import Dataset
 from app.models.job import Job
 from app.models.ml_model import MLModel
 from app.models.predictions import Prediction
-from fastapi.middleware.cors import CORSMiddleware
-
 
 from app.api.routes.auth import router as auth_router
+from app.api.routes.datasets import router as dataset_router
 
-app = FastAPI()
+
+app = FastAPI(
+    title="ML Analysis Project",
+    version="1.0.0"
+)
 
 Base.metadata.create_all(bind=engine)
 
-app.include_router(auth_router)
-
-
 origins = [
-    "http://localhost:3000",  # React
-    "http://localhost:5173",  # Vite React
+    "http://localhost:3000",
+    "http://localhost:5173",
 ]
 
 app.add_middleware(
@@ -30,6 +32,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_router)
+app.include_router(dataset_router)
+
 
 @app.get("/")
 def home():

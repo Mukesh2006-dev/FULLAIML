@@ -1,0 +1,45 @@
+from typing import List
+from fastapi import APIRouter, Depends, UploadFile, File
+from sqlalchemy.orm import Session
+
+from app.core.database import get_db
+from app.schemas.dataset import DatasetResponse
+from app.services.dataset_service import (
+    upload_dataset_service,
+    list_datasets_service,
+    get_dataset_service,
+    delete_dataset_service,
+)
+
+router = APIRouter(prefix="/datasets", tags=["Datasets"])
+
+
+@router.post("/upload", response_model=DatasetResponse)
+def upload_dataset(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db)
+):
+    user_id = 1
+
+    return upload_dataset_service(file=file, user_id=user_id, db=db)
+
+
+@router.get("/", response_model=List[DatasetResponse])
+def list_datasets(db: Session = Depends(get_db)):
+    user_id = 1
+
+    return list_datasets_service(user_id=user_id, db=db)
+
+
+@router.get("/{dataset_id}", response_model=DatasetResponse)
+def get_dataset(dataset_id: int, db: Session = Depends(get_db)):
+    user_id = 1
+
+    return get_dataset_service(dataset_id=dataset_id, user_id=user_id, db=db)
+
+
+@router.delete("/{dataset_id}")
+def delete_dataset(dataset_id: int, db: Session = Depends(get_db)):
+    user_id = 1
+
+    return delete_dataset_service(dataset_id=dataset_id, user_id=user_id, db=db)
