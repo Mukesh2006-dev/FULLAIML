@@ -1,8 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from datetime import datetime
-
 from app.core.database import Base
-
+from sqlalchemy.orm import relationship
 
 class Dataset(Base):
     __tablename__ = "datasets"
@@ -22,3 +21,5 @@ class Dataset(Base):
     columns_count = Column(Integer)
 
     uploaded_at = Column(DateTime, default=datetime.utcnow)
+
+    owner=relationship("User",back_populates="datasets")
