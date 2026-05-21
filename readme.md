@@ -58,12 +58,3 @@ app/
  ├── services/
  ├── workers/
  └── main.py
-
-
-## Features devlopment
-1.First feature devlopment 
-User Authentication Feature
-
-Users can:
-register account
-login securely
