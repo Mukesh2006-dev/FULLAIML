@@ -11,8 +11,8 @@ from app.models.predictions import Prediction
 
 from app.api.routes.auth import router as auth_router
 from app.api.routes.datasets import router as dataset_router
-
 from app.api.routes.preprocessing import router as preprocessing_router
+from app.api.routes.analysis import router as analysis_router
 
 app = FastAPI(
     title="ML Analysis Project",
@@ -37,7 +37,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(dataset_router)
 app.include_router(preprocessing_router)
-
+app.include_router(analysis_router)
 
 @app.get("/")
 def home():
