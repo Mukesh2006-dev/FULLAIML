@@ -7,33 +7,54 @@ from app.models.dataset import Dataset
 from app.utils.file_utils import save_upload_file
 
 
+def read_csv_safely(file_path: str):
+    encodings = ["utf-8", "latin1", "ISO-8859-1", "cp1252"]
+
+    for encoding in encodings:
+        try:
+            return pd.read_csv(file_path, encoding=encoding)
+        except UnicodeDecodeError:
+            continue
+        except Exception as e:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid CSV file: {str(e)}"
+            )
+
+    raise HTTPException(
+        status_code=400,
+        detail="Invalid CSV file: unsupported encoding"
+    )
+
+
 def upload_dataset_service(file: UploadFile, user_id: int, db: Session):
-    if not file.filename.endswith(".csv"):
+    if not file.filename or not file.filename.lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only CSV files are allowed")
 
     stored_filename, stored_path, file_size = save_upload_file(file)
 
     try:
-        df = pd.read_csv(stored_path)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Invalid CSV file")
+        df = read_csv_safely(stored_path)
 
-    file_size = os.path.getsize(stored_path)
+        new_dataset = Dataset(
+            user_id=user_id,
+            filename=file.filename,
+            stored_path=stored_path,
+            file_size=file_size,
+            rows_count=df.shape[0],
+            columns_count=df.shape[1],
+        )
 
-    new_dataset = Dataset(
-        user_id=user_id,
-        filename=file.filename,
-        stored_path=stored_path,
-        file_size=file_size,
-        rows_count=df.shape[0],
-        columns_count=df.shape[1],
-    )
+        db.add(new_dataset)
+        db.commit()
+        db.refresh(new_dataset)
 
-    db.add(new_dataset)
-    db.commit()
-    db.refresh(new_dataset)
+        return new_dataset
 
-    return new_dataset
+    except HTTPException:
+        if os.path.exists(stored_path):
+            os.remove(stored_path)
+        raise
 
 
 def list_datasets_service(user_id: int, db: Session):
@@ -41,10 +62,14 @@ def list_datasets_service(user_id: int, db: Session):
 
 
 def get_dataset_service(dataset_id: int, user_id: int, db: Session):
-    dataset = db.query(Dataset).filter(
-        Dataset.id == dataset_id,
-        Dataset.user_id == user_id
-    ).first()
+    dataset = (
+        db.query(Dataset)
+        .filter(
+            Dataset.id == dataset_id,
+            Dataset.user_id == user_id,
+        )
+        .first()
+    )
 
     if not dataset:
         raise HTTPException(status_code=404, detail="Dataset not found")
