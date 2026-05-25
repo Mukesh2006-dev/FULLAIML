@@ -5,26 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.dataset import Dataset
 from app.utils.file_utils import save_upload_file
-
-
-def read_csv_safely(file_path: str):
-    encodings = ["utf-8", "latin1", "ISO-8859-1", "cp1252"]
-
-    for encoding in encodings:
-        try:
-            return pd.read_csv(file_path, encoding=encoding)
-        except UnicodeDecodeError:
-            continue
-        except Exception as e:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid CSV file: {str(e)}"
-            )
-
-    raise HTTPException(
-        status_code=400,
-        detail="Invalid CSV file: unsupported encoding"
-    )
+from app.utils.csv_utils import read_csv_safely
 
 
 def upload_dataset_service(file: UploadFile, user_id: int, db: Session):
