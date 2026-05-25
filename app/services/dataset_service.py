@@ -8,6 +8,11 @@ from app.utils.file_utils import save_upload_file
 from app.utils.csv_utils import read_csv_safely
 
 
+from app.models.ml_model import MLModel
+from app.models.predictions import Prediction
+from app.models.job import Job
+from app.utils.file_utils import delete_file_if_exists
+
 def upload_dataset_service(file: UploadFile, user_id: int, db: Session):
     if not file.filename or not file.filename.lower().endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only CSV files are allowed")
@@ -61,10 +66,39 @@ def get_dataset_service(dataset_id: int, user_id: int, db: Session):
 def delete_dataset_service(dataset_id: int, user_id: int, db: Session):
     dataset = get_dataset_service(dataset_id, user_id, db)
 
-    if os.path.exists(dataset.stored_path):
-        os.remove(dataset.stored_path)
+    trained_models = (
+        db.query(MLModel)
+        .filter(MLModel.dataset_id == dataset.id)
+        .all()
+    )
+
+    for model in trained_models:
+        delete_file_if_exists(model.model_path)
+
+    model_ids = [model.id for model in trained_models]
+
+    if model_ids:
+        db.query(Prediction).filter(
+            Prediction.model_id.in_(model_ids)
+        ).delete(synchronize_session=False)
+
+    deleted_models = (
+        db.query(MLModel)
+        .filter(MLModel.dataset_id == dataset.id)
+        .delete(synchronize_session=False)
+    )
+
+    db.query(Job).filter(
+        Job.dataset_id == dataset.id
+    ).delete(synchronize_session=False)
+
+    delete_file_if_exists(dataset.stored_path)
 
     db.delete(dataset)
     db.commit()
 
-    return {"message": "Dataset deleted successfully"}
+    return {
+        "message": "Dataset and related resources deleted successfully",
+        "dataset_id": dataset_id,
+        "deleted_models": deleted_models,
+    }
