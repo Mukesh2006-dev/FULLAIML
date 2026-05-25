@@ -21,6 +21,7 @@ from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from app.models.dataset import Dataset
 from app.models.ml_model import MLModel
 from app.schemas.ml_model import TrainModelRequest
+from app.utils.csv_utils import read_csv_safely
 
 
 MODEL_DIR = "storage/models"
@@ -62,14 +63,25 @@ def get_algorithm_model(algorithm: str, problem_type: str, hyperparameters: dict
 
 def prepare_dataset(df: pd.DataFrame, target_column: str):
     if target_column not in df.columns:
-        raise HTTPException(status_code=400, detail="Target column not found")
+        raise HTTPException(
+            status_code=400,
+            detail="Target column not found"
+        )
 
-    df = df.dropna()
+    df = df.dropna(subset=[target_column])
 
     X = df.drop(columns=[target_column])
     y = df[target_column]
 
+    for col in X.columns:
+        if pd.api.types.is_numeric_dtype(X[col]):
+            X[col] = X[col].fillna(X[col].median())
+        else:
+            X[col] = X[col].fillna("missing")
+
     X = pd.get_dummies(X, drop_first=True)
+
+    X = X.fillna(0)
 
     label_encoder = None
 
@@ -86,13 +98,7 @@ def train_model_service(request: TrainModelRequest, user_id: int, db: Session):
         user_id=user_id,
         db=db
     )
-    try:
-      df = pd.read_csv(dataset.stored_path)
-    except Exception as e:
-      raise HTTPException(
-        status_code=400,
-        detail=f"Unable to read dataset: {str(e)}"
-    )
+    df=read_csv_safely(dataset.stored_path)
 
     X, y, label_encoder = prepare_dataset(df, request.target_column)
 
