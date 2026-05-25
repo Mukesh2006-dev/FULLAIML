@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.models.dataset import Dataset
 
+from app.utils.csv_utils import read_csv_safely
 
 def get_dataset_or_404(dataset_id: int, user_id: int, db: Session):
     dataset = db.query(Dataset).filter(
@@ -19,7 +20,7 @@ def get_dataset_or_404(dataset_id: int, user_id: int, db: Session):
 
 def load_dataset(dataset: Dataset):
     try:
-        return pd.read_csv(dataset.stored_path)
+        return read_csv_safely(dataset.stored_path)
     except Exception:
         raise HTTPException(status_code=400, detail="Unable to read dataset")
 
