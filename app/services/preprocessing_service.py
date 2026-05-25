@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.dataset import Dataset
+from app.utils.csv_utils import read_csv_safely
 
 CLEANED_DIR = "storage/cleaned"
 os.makedirs(CLEANED_DIR, exist_ok=True)
@@ -34,7 +35,7 @@ def save_cleaned_file(df, original_filename: str):
 def remove_missing_values_service(dataset_id: int, user_id: int, db: Session):
     dataset = get_dataset_or_404(dataset_id, user_id, db)
 
-    df = pd.read_csv(dataset.stored_path)
+    df = read_csv_safely(dataset.stored_path)
 
     original_rows = df.shape[0]
     cleaned_df = df.dropna()
@@ -54,7 +55,7 @@ def remove_missing_values_service(dataset_id: int, user_id: int, db: Session):
 def remove_duplicates_service(dataset_id: int, user_id: int, db: Session):
     dataset = get_dataset_or_404(dataset_id, user_id, db)
 
-    df = pd.read_csv(dataset.stored_path)
+    df = read_csv_safely(dataset.stored_path)
 
     original_rows = df.shape[0]
     cleaned_df = df.drop_duplicates()
@@ -74,7 +75,7 @@ def remove_duplicates_service(dataset_id: int, user_id: int, db: Session):
 def auto_clean_service(dataset_id: int, user_id: int, db: Session):
     dataset = get_dataset_or_404(dataset_id, user_id, db)
 
-    df = pd.read_csv(dataset.stored_path)
+    df = read_csv_safely(dataset.stored_path)
 
     original_rows = df.shape[0]
 
