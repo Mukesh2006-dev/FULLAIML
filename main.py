@@ -9,12 +9,14 @@ from app.models.job import Job
 from app.models.ml_model import MLModel
 from app.models.predictions import Prediction
 
+
 from app.api.routes.auth import router as auth_router
 from app.api.routes.datasets import router as dataset_router
 from app.api.routes.preprocessing import router as preprocessing_router
 from app.api.routes.analysis import router as analysis_router
 from app.api.routes.ml import router as ml_router
 from app.api.routes.visualization import router as visual_router
+
 
 app = FastAPI(
     title="ML Analysis Project",
@@ -42,6 +44,7 @@ app.include_router(preprocessing_router)
 app.include_router(analysis_router)
 app.include_router(ml_router)
 app.include_router(visual_router)
+
 
 @app.get("/")
 def home():
