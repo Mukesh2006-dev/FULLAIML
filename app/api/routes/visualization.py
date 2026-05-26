@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.core.database import get_db
+from app.api.dependencies import get_current_user
+from app.models.user import User
 from app.services.visualization_service import (
     generate_histogram_service,
     generate_correlation_heatmap_service,
@@ -16,14 +18,14 @@ router = APIRouter(prefix="/visualizations", tags=["Visualizations"])
 def generate_histogram(
     dataset_id: int,
     column: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user:User=Depends(get_current_user)
 ):
-    user_id = 1
 
     return generate_histogram_service(
         dataset_id=dataset_id,
         column=column,
-        user_id=user_id,
+        user_id=current_user.id,
         db=db
     )
 
@@ -31,13 +33,13 @@ def generate_histogram(
 @router.get("/{dataset_id}/heatmap")
 def generate_heatmap(
     dataset_id: int,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user:User=Depends(get_current_user)
 ):
-    user_id = 1
 
     return generate_correlation_heatmap_service(
         dataset_id=dataset_id,
-        user_id=user_id,
+        user_id=current_user.id,
         db=db
     )
 
@@ -47,15 +49,15 @@ def generate_scatter_plot(
     dataset_id: int,
     x_column: str,
     y_column: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user:User=Depends(get_current_user)
 ):
-    user_id = 1
 
     return generate_scatter_plot_service(
         dataset_id=dataset_id,
         x_column=x_column,
         y_column=y_column,
-        user_id=user_id,
+        user_id=current_user.id,
         db=db
     )
 
@@ -64,13 +66,13 @@ def generate_scatter_plot(
 def generate_bar_chart(
     dataset_id: int,
     column: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user:User=Depends(get_current_user)
 ):
-    user_id = 1
 
     return generate_bar_chart_service(
         dataset_id=dataset_id,
         column=column,
-        user_id=user_id,
+        user_id=current_user.id,
         db=db
     )
