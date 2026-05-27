@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Database, Lock, Mail, User, ArrowRight } from "lucide-react";
 import API from "../utils/api";
+import Silk from "../components/Silk";
 import "./Register.css";
 
 const Register = () => {
@@ -48,8 +49,9 @@ const Register = () => {
 
   return (
     <div className="register-container page-enter">
-      <div className="register-glow-circle-1"></div>
-      <div className="register-glow-circle-2"></div>
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-30">
+        <Silk speed={3} scale={1} color="#7c3aed" noiseIntensity={1.2} rotation={0} />
+      </div>
 
       <div className="register-card glass-panel">
         <div className="register-header">

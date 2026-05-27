@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Database, Lock, Mail, ArrowRight } from "lucide-react";
 import API from "../utils/api";
+import Silk from "../components/Silk";
 import "./Login.css";
 
 const Login = () => {
@@ -36,8 +37,9 @@ const Login = () => {
 
   return (
     <div className="login-container page-enter">
-      <div className="login-glow-circle-1"></div>
-      <div className="login-glow-circle-2"></div>
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-30">
+        <Silk speed={3} scale={1} color="#00f0ff" noiseIntensity={1.2} rotation={0} />
+      </div>
       
       <div className="login-card glass-panel">
         <div className="login-header">
