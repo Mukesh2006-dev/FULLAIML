@@ -7,11 +7,11 @@
   /* ── Surfaces ── */
   --bg-root: #06080f;
   --bg-body: #0a0e1a;
-  --bg-card: rgba(14, 18, 36, 0.72);
+  --bg-card: rgba(14, 18, 36, 0.3);
   --bg-card-solid: #0e1224;
-  --bg-card-hover: rgba(18, 24, 48, 0.85);
-  --bg-inset: rgba(6, 8, 18, 0.55);
-  --bg-input: rgba(12, 16, 32, 0.7);
+  --bg-card-hover: rgba(18, 24, 48, 0.4);
+  --bg-inset: rgba(6, 8, 18, 0.2);
+  --bg-input: rgba(12, 16, 32, 0.3);
 
   /* ── Borders ── */
   --border-subtle: rgba(255, 255, 255, 0.06);
@@ -39,7 +39,7 @@
 
   /* ── Gradients ── */
   --gradient-primary: linear-gradient(135deg, #00f0ff 0%, #7c3aed 100%);
-  --gradient-card-border: linear-gradient(135deg, rgba(0,240,255,0.2) 0%, rgba(124,58,237,0.12) 100%);
+  --gradient-card-border: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(124, 58, 237, 0.12) 100%);
   --gradient-hero-text: linear-gradient(135deg, #00f0ff 0%, #a78bfa 50%, #ec4899 100%);
   --gradient-btn-primary: linear-gradient(135deg, #00c8d4 0%, #7c3aed 100%);
   --gradient-btn-hover: linear-gradient(135deg, #00e0ec 0%, #8b5cf6 100%);
@@ -95,7 +95,12 @@ body {
 }
 
 /* ── Typography Defaults ── */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: var(--font-display);
   font-weight: 700;
   color: var(--text-primary);
@@ -107,15 +112,18 @@ a {
   text-decoration: none;
 }
 
-button, input, select, textarea {
+button,
+input,
+select,
+textarea {
   font-family: inherit;
   color: inherit;
 }
 
 /* Chrome, Safari, Edge autofill styling override for dark mode */
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 1000px #0c1020 inset !important;
   -webkit-text-fill-color: var(--text-primary) !important;
@@ -191,12 +199,14 @@ input:-webkit-autofill:active {
 }
 
 /* ── Interactive Elements ── */
-button, .clickable {
+button,
+.clickable {
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-button:active, .clickable:active {
+button:active,
+.clickable:active {
   transform: scale(0.97);
 }
 
@@ -206,6 +216,7 @@ button:active, .clickable:active {
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -220,6 +231,7 @@ button:active, .clickable:active {
   0% {
     background-position: -200% 0;
   }
+
   100% {
     background-position: 200% 0;
   }
@@ -232,8 +244,13 @@ button:active, .clickable:active {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .animate-spin {
@@ -241,11 +258,25 @@ button:active, .clickable:active {
 }
 
 /* ── Utility Text Colors ── */
-.text-success { color: var(--text-success); }
-.text-danger { color: var(--text-danger); }
-.text-warning { color: var(--text-warning); }
-.text-accent { color: var(--text-cyan); }
-.text-purple { color: var(--text-purple); }
+.text-success {
+  color: var(--text-success);
+}
+
+.text-danger {
+  color: var(--text-danger);
+}
+
+.text-warning {
+  color: var(--text-warning);
+}
+
+.text-accent {
+  color: var(--text-cyan);
+}
+
+.text-purple {
+  color: var(--text-purple);
+}
 
 /* ── Utility Label Style ── */
 .label-upper {
