@@ -3,21 +3,21 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import os
 
-from app.core.database import Base, engine
+from Backend.app.core.database import Base, engine
 
-from app.models.user import User
-from app.models.dataset import Dataset
-from app.models.job import Job
-from app.models.ml_model import MLModel
-from app.models.predictions import Prediction
+from Backend.app.models.user import User
+from Backend.app.models.dataset import Dataset
+from Backend.app.models.job import Job
+from Backend.app.models.ml_model import MLModel
+from Backend.app.models.predictions import Prediction
 
 
-from app.api.routes.auth import router as auth_router
-from app.api.routes.datasets import router as dataset_router
-from app.api.routes.preprocessing import router as preprocessing_router
-from app.api.routes.analysis import router as analysis_router
-from app.api.routes.ml import router as ml_router
-from app.api.routes.visualization import router as visual_router
+from Backend.app.api.routes.auth import router as auth_router
+from Backend.app.api.routes.datasets import router as dataset_router
+from Backend.app.api.routes.preprocessing import router as preprocessing_router
+from Backend.app.api.routes.analysis import router as analysis_router
+from Backend.app.api.routes.ml import router as ml_router
+from Backend.app.api.routes.visualization import router as visual_router
 
 
 app = FastAPI(
