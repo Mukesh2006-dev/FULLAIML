@@ -27,14 +27,10 @@ def get_dataset_or_404(dataset_id: int, user_id: int, db: Session):
     return dataset
 
 
+from app.services.dataset_service import read_csv_safely
+
 def load_dataframe(dataset: Dataset):
-    try:
-        return pd.read_csv(dataset.stored_path)
-    except Exception as e:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Unable to read dataset: {str(e)}"
-        )
+    return read_csv_safely(dataset.stored_path)
 
 
 def save_chart():

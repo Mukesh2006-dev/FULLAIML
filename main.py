@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+import os
 
 from app.core.database import Base, engine
 
@@ -22,6 +24,10 @@ app = FastAPI(
     title="ML Analysis Project",
     version="1.0.0"
 )
+
+# Ensure chart storage directory exists and serve static files
+os.makedirs("storage/charts", exist_ok=True)
+app.mount("/charts", StaticFiles(directory="storage/charts"), name="charts")
 
 Base.metadata.create_all(bind=engine)
 

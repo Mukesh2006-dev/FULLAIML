@@ -19,10 +19,7 @@ def get_dataset_or_404(dataset_id: int, user_id: int, db: Session):
 
 
 def load_dataset(dataset: Dataset):
-    try:
-        return read_csv_safely(dataset.stored_path)
-    except Exception:
-        raise HTTPException(status_code=400, detail="Unable to read dataset")
+    return read_csv_safely(dataset.stored_path)
 
 
 def generate_summary_service(dataset_id: int, user_id: int, db: Session):

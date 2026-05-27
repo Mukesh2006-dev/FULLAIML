@@ -98,7 +98,7 @@ def train_model_service(request: TrainModelRequest, user_id: int, db: Session):
         user_id=user_id,
         db=db
     )
-    df=read_csv_safely(dataset.stored_path)
+    df = read_csv_safely(dataset.stored_path)
 
     X, y, label_encoder = prepare_dataset(df, request.target_column)
 
