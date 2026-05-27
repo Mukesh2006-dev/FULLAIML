@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unknown-property */
 import { forwardRef, useMemo, useRef, useLayoutEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Color } from 'three';

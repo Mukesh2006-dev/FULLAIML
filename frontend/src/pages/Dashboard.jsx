@@ -86,7 +86,7 @@ const Dashboard = () => {
       // Reset input element
       const inputEl = document.getElementById("csv-file-input");
       if (inputEl) inputEl.value = "";
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
     fetchDatasets();
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to upload file.");
@@ -144,7 +144,7 @@ const Dashboard = () => {
     });
     if (hadResult) {
       setSuccess("Dataset and all related resources deleted successfully.");
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+       
     fetchDatasets();
     }
   };

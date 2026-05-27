@@ -78,7 +78,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+         
     setProfileOpen(false);
       }
     };
