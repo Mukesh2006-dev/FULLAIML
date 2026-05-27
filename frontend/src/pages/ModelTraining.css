@@ -1,0 +1,405 @@
+/* ═══════════════════════════════════════════════════════
+   Model Training — Cyber-Dark Neon Glassmorphism
+   ═══════════════════════════════════════════════════════ */
+
+.ml-container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* ── Header ── */
+.ml-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.ml-title-section h1 {
+  font-family: var(--font-display);
+  font-size: 2.25rem;
+  font-weight: 800;
+  background: var(--gradient-hero-text);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 0.25rem;
+}
+
+.ml-title-section p {
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+/* ── Alert ── */
+.ml-alert {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+/* ── Grid ── */
+.ml-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.25fr;
+  gap: 2rem;
+}
+
+@media (max-width: 900px) {
+  .ml-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── Cards ── */
+.ml-setup-card, .ml-results-card {
+  padding: 2rem;
+}
+
+.ml-setup-card h2, .ml-results-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.card-desc {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Form ── */
+.ml-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  margin-top: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.form-group select, .form-group input {
+  padding: 0.7rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.form-group select:focus, .form-group input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.08);
+  background: rgba(12, 16, 32, 0.9);
+}
+
+.form-group input::placeholder {
+  color: var(--text-muted);
+}
+
+.double-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field-hint {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+/* ── Hyperparameters Section ── */
+.hyperparameters-section {
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  background: var(--bg-inset);
+}
+
+.hyper-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.hyper-header svg {
+  color: var(--accent-cyan);
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
+}
+
+.hyper-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.forest-params {
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 1rem;
+}
+
+/* ── Train Button ── */
+.train-btn {
+  padding: 0.75rem;
+  background: var(--gradient-btn-primary);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: white;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 16px rgba(0, 200, 212, 0.2);
+  margin-top: 0.75rem;
+  transition: all var(--transition-fast);
+}
+
+.train-btn:hover:not(:disabled) {
+  background: var(--gradient-btn-hover);
+  box-shadow: 0 6px 24px rgba(0, 224, 236, 0.3);
+  transform: translateY(-1px);
+}
+
+.train-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ═══════════ Results Section ═══════════ */
+
+/* ── Idle State ── */
+.training-idle-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-inset);
+  flex: 1;
+}
+
+.idle-brain-icon {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.training-idle-state h3 {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.training-idle-state p {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  max-width: 340px;
+}
+
+/* ── Running State ── */
+.training-running {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 5rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.training-spin-ico {
+  color: var(--accent-amber);
+  filter: drop-shadow(0 0 12px rgba(245, 158, 11, 0.4));
+  margin-bottom: 1.5rem;
+}
+
+.training-running h3 {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  margin-top: 1rem;
+}
+
+.training-running p {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  max-width: 400px;
+}
+
+/* ── Report ── */
+.report-success-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.18);
+  border-radius: var(--radius-sm);
+  color: var(--text-success);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+}
+
+.success-ico {
+  color: var(--accent-green);
+  filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.4));
+}
+
+/* ── Performance Metrics ── */
+.performance-metrics-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.performance-metrics-title svg {
+  color: var(--accent-cyan);
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
+}
+
+.metrics-box-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.metric-box-item {
+  padding: 1.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  border-color: rgba(0, 240, 255, 0.1);
+  box-shadow: var(--shadow-sm), var(--shadow-glow-cyan);
+}
+
+.trophy-ico {
+  color: var(--accent-amber);
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.35));
+}
+
+.metric-box-lbl {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.metric-box-val {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* ── Model Metadata ── */
+.model-report-details {
+  margin-top: 0.5rem;
+}
+
+.model-report-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.model-report-header svg {
+  color: var(--accent-cyan);
+  filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
+}
+
+.meta-stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.meta-stat-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  border-bottom: 1px dashed var(--border-subtle);
+  padding-bottom: 0.4rem;
+}
+
+.meta-stat-row span {
+  color: var(--text-muted);
+}
+
+.meta-stat-row strong {
+  color: var(--text-cyan);
+}
+
+.file-path-row {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  border-bottom: none;
+}
+
+.filepath-text {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid var(--border-subtle);
+  padding: 0.4rem 0.6rem;
+  border-radius: 4px;
+  width: 100%;
+  text-align: left;
+  word-break: break-all;
+  color: var(--text-muted) !important;
+}
