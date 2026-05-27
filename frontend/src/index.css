@@ -1,289 +1,128 @@
-/* ═══════════════════════════════════════════════════════════════════
-   FULLAIML — Cyber-Dark Neon Glassmorphism Design System
-   Global Tokens, Base Styles, Utilities & Animations
-   ═══════════════════════════════════════════════════════════════════ */
+@import "tailwindcss";
 
-:root {
-  /* ── Surfaces ── */
-  --bg-root: #06080f;
-  --bg-body: #0a0e1a;
-  --bg-card: rgba(14, 18, 36, 0.3);
-  --bg-card-solid: #0e1224;
-  --bg-card-hover: rgba(18, 24, 48, 0.4);
-  --bg-inset: rgba(6, 8, 18, 0.2);
-  --bg-input: rgba(12, 16, 32, 0.3);
+@theme {
+  --color-bg-root: #06080f;
+  --color-bg-body: #0a0e1a;
+  --color-bg-card: rgba(14, 18, 36, 0.3);
+  --color-bg-card-solid: #0e1224;
+  --color-bg-card-hover: rgba(18, 24, 48, 0.4);
+  --color-bg-inset: rgba(6, 8, 18, 0.2);
+  --color-bg-input: rgba(12, 16, 32, 0.3);
 
-  /* ── Borders ── */
-  --border-subtle: rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.09);
-  --border-focus: rgba(0, 240, 255, 0.45);
-  --border-glow: rgba(0, 240, 255, 0.18);
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-default: rgba(255, 255, 255, 0.09);
+  --color-border-focus: rgba(0, 240, 255, 0.45);
+  --color-border-glow: rgba(0, 240, 255, 0.18);
 
-  /* ── Text ── */
-  --text-primary: #e8ecf4;
-  --text-secondary: #8892a8;
-  --text-muted: #5a6378;
-  --text-cyan: #00f0ff;
-  --text-purple: #a78bfa;
-  --text-warning: #fbbf24;
-  --text-danger: #f87171;
-  --text-success: #34d399;
+  --color-text-primary: #e8ecf4;
+  --color-text-secondary: #8892a8;
+  --color-text-muted: #5a6378;
+  --color-text-cyan: #00f0ff;
+  --color-text-purple: #a78bfa;
+  --color-text-warning: #fbbf24;
+  --color-text-danger: #f87171;
+  --color-text-success: #34d399;
 
-  /* ── Accents ── */
-  --accent-cyan: #00f0ff;
-  --accent-purple: #7c3aed;
-  --accent-pink: #ec4899;
-  --accent-green: #10b981;
-  --accent-red: #ef4444;
-  --accent-amber: #f59e0b;
+  --color-accent-cyan: #00f0ff;
+  --color-accent-purple: #7c3aed;
+  --color-accent-pink: #ec4899;
+  --color-accent-green: #10b981;
+  --color-accent-red: #ef4444;
+  --color-accent-amber: #f59e0b;
 
-  /* ── Gradients ── */
-  --gradient-primary: linear-gradient(135deg, #00f0ff 0%, #7c3aed 100%);
-  --gradient-card-border: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(124, 58, 237, 0.12) 100%);
-  --gradient-hero-text: linear-gradient(135deg, #00f0ff 0%, #a78bfa 50%, #ec4899 100%);
-  --gradient-btn-primary: linear-gradient(135deg, #00c8d4 0%, #7c3aed 100%);
-  --gradient-btn-hover: linear-gradient(135deg, #00e0ec 0%, #8b5cf6 100%);
-  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --font-display: "Palast", "Syne", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: "Palast", "Inter", sans-serif;
+  --font-body: "Palast", "JetBrains Mono", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  /* ── Shadows & Neon Glows ── */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow-cyan: 0 0 20px rgba(0, 240, 255, 0.12), 0 0 60px rgba(0, 240, 255, 0.05);
-  --shadow-glow-purple: 0 0 20px rgba(124, 58, 237, 0.12), 0 0 60px rgba(124, 58, 237, 0.05);
-
-  /* ── Radii ── */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
-  --radius-full: 9999px;
-
-  /* ── Transitions & Easings ── */
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-fast: 150ms var(--ease-out);
-  --transition-normal: 250ms var(--ease-out);
-  --transition-slow: 400ms var(--ease-out);
-
-  /* ── Typography ── */
-  --font-display: 'Syne', sans-serif;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-body: 'JetBrains Mono', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-}
-
-/* ── Reset ── */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-/* ── Body ── */
-body {
-  background-color: var(--bg-body);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  font-size: 14px;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  background-image:
-    radial-gradient(ellipse 80% 60% at 10% 20%, rgba(0, 240, 255, 0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 90% 80%, rgba(124, 58, 237, 0.04) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(236, 72, 153, 0.02) 0%, transparent 50%);
-  background-attachment: fixed;
-}
-
-/* ── Typography Defaults ── */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-display);
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-button,
-input,
-select,
-textarea {
-  font-family: inherit;
-  color: inherit;
-}
-
-/* Chrome, Safari, Edge autofill styling override for dark mode */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 1000px #0c1020 inset !important;
-  -webkit-text-fill-color: var(--text-primary) !important;
-  transition: background-color 5000s ease-in-out 0s;
-}
-
-
-/* ── Glassmorphic Card (glow-card) ── */
-.glow-card {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  position: relative;
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.glow-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: var(--gradient-card-border);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  -webkit-mask-composite: xor;
-  pointer-events: none;
-  opacity: 0.6;
-}
-
-.glow-card:hover {
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-md), var(--shadow-glow-cyan);
-}
-
-/* Legacy alias so existing JSX using glass-panel still works */
-.glass-panel {
-  background: var(--bg-card);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  position: relative;
-  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
-}
-
-.glass-panel:hover {
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-md), var(--shadow-glow-cyan);
-}
-
-/* ── Custom Scrollbars ── */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(90, 99, 120, 0.4);
-  border-radius: var(--radius-full);
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(136, 146, 168, 0.5);
-}
-
-/* ── Interactive Elements ── */
-button,
-.clickable {
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-button:active,
-.clickable:active {
-  transform: scale(0.97);
-}
-
-/* ── Animations ── */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
+  
+  --animate-shimmer: shimmer 1.5s infinite linear;
+  --animate-fade-in-up: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-overlay-fade-in: overlayFadeIn 0.2s ease-out both;
+  --animate-modal-slide-in: modalSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-danger-pulse: dangerPulse 2s ease-in-out infinite;
+  --animate-success-pop: successPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-progress-slide: progressSlide 1.2s ease-in-out infinite;
+  --animate-result-card-in: resultCardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes overlayFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes modalSlideIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.96); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes dangerPulse {
+    0%, 100% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.1); }
+    50% { box-shadow: 0 0 36px rgba(239, 68, 68, 0.2); }
+  }
+  @keyframes successPop {
+    from { transform: scale(0.6); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  @keyframes progressSlide {
+    0% { transform: translateX(-100%); width: 40%; }
+    50% { width: 60%; }
+    100% { transform: translateX(350%); width: 40%; }
+  }
+  @keyframes resultCardIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 }
 
-.page-enter {
-  animation: fadeInUp 0.4s var(--ease-out) both;
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -200% 0;
+@layer base {
+  body {
+    @apply bg-bg-body text-text-primary font-body antialiased;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 10% 20%, rgba(0, 240, 255, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 90% 80%, rgba(124, 58, 237, 0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(236, 72, 153, 0.02) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display font-bold text-text-primary tracking-tight;
   }
 
-  100% {
-    background-position: 200% 0;
-  }
-}
-
-.shimmer-loader {
-  background: linear-gradient(90deg, var(--bg-card-solid) 25%, #1a2040 50%, var(--bg-card-solid) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #0c1020 inset !important;
+    -webkit-text-fill-color: theme('colors.text-primary') !important;
+    transition: background-color 5000s ease-in-out 0s;
   }
 }
 
-.animate-spin {
-  animation: spin 1s linear infinite;
+@layer utilities {
+  .glow-card {
+    @apply bg-bg-card backdrop-blur-md border border-border-default rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.45)] relative transition-all duration-300 ease-out;
+  }
+  .glow-card:hover {
+    @apply border-border-glow shadow-[0_4px_16px_rgba(0,0,0,0.45),_0_0_20px_rgba(0,240,255,0.12),_0_0_60px_rgba(0,240,255,0.05)];
+  }
+
+  .label-upper {
+    @apply font-mono text-[0.7rem] font-semibold uppercase tracking-widest text-text-secondary;
+  }
 }
 
-/* ── Utility Text Colors ── */
-.text-success {
-  color: var(--text-success);
-}
-
-.text-danger {
-  color: var(--text-danger);
-}
-
-.text-warning {
-  color: var(--text-warning);
-}
-
-.text-accent {
-  color: var(--text-cyan);
-}
-
-.text-purple {
-  color: var(--text-purple);
-}
-
-/* ── Utility Label Style ── */
-.label-upper {
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-secondary);
-}
+/* Custom scrollbars */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(90, 99, 120, 0.4); border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(136, 146, 168, 0.5); }

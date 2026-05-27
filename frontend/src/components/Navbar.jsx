@@ -12,7 +12,6 @@ import {
   Settings,
   Moon
 } from "lucide-react";
-import "./Navbar.css";
 
 const NAV_ITEMS = [
   { path: "/dashboard", label: "Dashboard" },
@@ -27,7 +26,6 @@ const Navbar = () => {
   const currentLocation = useLocation();
   const token = localStorage.getItem("token");
 
-  // Scroll state
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
@@ -35,21 +33,17 @@ const Navbar = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
-    // Trigger once on mount to set initial state
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Sliding pill refs & state
   const linksContainerRef = useRef(null);
   const linkRefs = useRef([]);
   const [pillStyle, setPillStyle] = useState({ width: 0, x: 0, opacity: 0 });
 
-  // Profile dropdown state
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
 
-  // Calculate pill position based on active link
   const updatePill = useCallback(() => {
     const activeIndex = NAV_ITEMS.findIndex((item) => item.path === currentLocation.pathname);
     if (activeIndex === -1 || !linkRefs.current[activeIndex] || !linksContainerRef.current) {
@@ -69,19 +63,16 @@ const Navbar = () => {
     });
   }, [currentLocation.pathname]);
 
-  // Recalculate on route change
   useEffect(() => {
     const raf = requestAnimationFrame(updatePill);
     return () => cancelAnimationFrame(raf);
   }, [updatePill]);
 
-  // Recalculate on resize
   useEffect(() => {
     window.addEventListener("resize", updatePill);
     return () => window.removeEventListener("resize", updatePill);
   }, [updatePill]);
 
-  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
@@ -92,7 +83,6 @@ const Navbar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close dropdown on route change
   useEffect(() => {
     setProfileOpen(false);
   }, [currentLocation.pathname]);
@@ -105,18 +95,30 @@ const Navbar = () => {
   };
 
   return (
-    <nav className={`navbar-container ${isScrolled ? "scrolled" : "at-top"}`}>
-      <div className="navbar-left">
-        <button type="button" className="navbar-brand clickable" onClick={() => navigate("/dashboard")}>
-          <Database className="brand-icon" size={20} />
-          <span className="brand-text">FullAIML</span>
+    <nav
+      className={`fixed left-1/2 -translate-x-1/2 z-50 flex items-center justify-between backdrop-blur-2xl backdrop-saturate-[1.6] transition-all duration-700 ease-out w-full sm:bottom-auto bottom-4 sm:top-auto ${
+        isScrolled
+          ? "sm:top-5 max-w-[850px] px-2.5 py-1.5 gap-3 rounded-full bg-transparent border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.9),0_0_20px_rgba(255,255,255,0.03),inset_0_1px_0_rgba(255,255,255,0.08)] hover:bg-white/5"
+          : "sm:top-0 max-w-full px-8 py-3 rounded-none bg-transparent border border-transparent border-b-white/5 shadow-none"
+      } max-sm:px-1.5 max-sm:gap-1 max-sm:rounded-full max-sm:border-white/10 max-sm:bg-bg-root/80 max-sm:w-[95%]`}
+    >
+      <div className="flex items-center max-sm:hidden">
+        <button
+          type="button"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer transition-all duration-300 relative bg-transparent hover:bg-white/5 active:scale-95"
+          onClick={() => navigate("/dashboard")}
+        >
+          <Database className="text-text-primary shrink-0" size={20} />
+          <span className="font-sans text-[1.05rem] font-bold text-text-primary tracking-tight whitespace-nowrap">
+            FullAIML
+          </span>
         </button>
       </div>
 
-      <ul className="navbar-links" ref={linksContainerRef}>
-        {/* The sliding pill indicator */}
+      <ul className="flex list-none gap-1 items-center relative p-0 m-0 w-full sm:w-auto justify-center" ref={linksContainerRef}>
+        {/* Sliding Pill */}
         <div
-          className="navbar-pill"
+          className="absolute top-0 left-0 h-full rounded-full bg-white/5 pointer-events-none z-0 transition-all duration-500 ease-out will-change-[transform,width]"
           style={{
             width: `${pillStyle.width}px`,
             transform: `translateX(${pillStyle.x}px)`,
@@ -131,65 +133,98 @@ const Navbar = () => {
               <Link
                 to={item.path}
                 ref={(el) => (linkRefs.current[index] = el)}
-                className={`navbar-link ${isActive ? "active" : ""}`}
+                className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-full font-sans text-sm font-medium transition-colors duration-300 whitespace-nowrap no-underline border-none bg-transparent z-10 ${
+                  isActive ? "text-text-primary" : "text-white/60 hover:text-text-primary"
+                } max-lg:px-2.5 max-sm:px-2 max-sm:text-xs`}
               >
-                <span>{item.label}</span>
+                <span className="max-sm:hidden max-lg:hidden">{item.label}</span>
+                {/* Fallback icons for mobile since text is hidden */}
+                <span className="lg:hidden">
+                  {index === 0 && <LayoutDashboard size={18} />}
+                  {index === 1 && <Sparkles size={18} />}
+                  {index === 2 && <SearchCode size={18} />}
+                  {index === 3 && <LineChart size={18} />}
+                  {index === 4 && <BrainCircuit size={18} />}
+                </span>
               </Link>
             </li>
           );
         })}
       </ul>
 
-      <div className="navbar-right">
-        {/* ── Additional Action Icons ── */}
-      <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', marginRight: '0.5rem', marginLeft: '0.2rem' }}>
-        <button type="button" className="icon-btn clickable" style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.6)', cursor: 'pointer' }}>
-          <Moon size={18} />
-        </button>
-      </div>
-
-      {/* ── Profile Avatar with Dropdown ── */}
-      <div className="profile-wrapper" ref={profileRef}>
-        <button type="button"
-          className={`profile-avatar-btn clickable ${profileOpen ? "open" : ""}`}
-          onClick={() => setProfileOpen((prev) => !prev)}
-          title="Profile"
-          aria-expanded={profileOpen}
-          aria-haspopup="true"
-        >
-          <User size={16} />
-        </button>
-
-        {/* Dropdown Menu */}
-        <div className={`profile-dropdown ${profileOpen ? "visible" : ""}`}>
-          {/* User Info Header */}
-          <div className="profile-dropdown-header">
-            <div className="profile-dropdown-avatar">
-              <User size={18} />
-            </div>
-            <div className="profile-dropdown-info">
-              <span className="profile-dropdown-name">User</span>
-              <span className="profile-dropdown-role">ML Engineer</span>
-            </div>
-          </div>
-
-          <div className="profile-dropdown-divider" />
-
-          {/* Menu Items */}
-          <button type="button" className="profile-dropdown-item clickable">
-            <Settings size={14} />
-            <span>Settings</span>
-          </button>
-
-          <div className="profile-dropdown-divider" />
-
-          {/* Logout */}
-          <button type="button" className="profile-dropdown-item danger clickable" onClick={handleLogout}>
-            <LogOut size={14} />
-            <span>Log Out</span>
+      <div className="flex items-center">
+        {/* Actions */}
+        <div className="flex items-center gap-3 mr-2 ml-1">
+          <button
+            type="button"
+            className="bg-transparent border-none text-white/60 cursor-pointer hover:text-text-primary transition-colors active:scale-95"
+          >
+            <Moon size={18} />
           </button>
         </div>
-      </div>
+
+        {/* Profile */}
+        <div className="relative" ref={profileRef}>
+          <button
+            type="button"
+            className={`w-[34px] h-[34px] rounded-full border-[1.5px] border-white/15 bg-white/5 flex items-center justify-center cursor-pointer transition-all duration-300 shrink-0 relative active:scale-95 max-sm:w-8 max-sm:h-8 ${
+              profileOpen
+                ? "border-border-focus bg-border-glow text-accent-cyan shadow-[0_0_18px_var(--color-border-glow)]"
+                : "text-white/60 hover:border-border-focus hover:bg-border-glow hover:text-accent-cyan hover:shadow-[0_0_14px_var(--color-border-glow)]"
+            }`}
+            onClick={() => setProfileOpen((prev) => !prev)}
+          >
+            <User size={16} />
+            {profileOpen && (
+              <span className="absolute -inset-[3px] rounded-full border-[1.5px] border-border-focus animate-[profileRingPulse_1.5s_ease-in-out_infinite]" />
+            )}
+          </button>
+
+          {/* Dropdown */}
+          <div
+            className={`absolute top-[calc(100%+12px)] right-[-8px] min-w-[220px] p-2 rounded-md bg-bg-card-solid/90 backdrop-blur-2xl backdrop-saturate-[1.6] border border-white/10 shadow-[0_16px_48px_rgba(0,0,0,0.5),0_0_0_1px_rgba(0,0,0,0.15),0_0_30px_var(--color-border-glow)] z-50 origin-top-right transition-all duration-300 max-sm:right-[-4px] max-sm:min-w-[200px] ${
+              profileOpen ? "opacity-100 visible translate-y-0 scale-100" : "opacity-0 invisible -translate-y-2 scale-95"
+            }`}
+          >
+            {/* Arrow */}
+            <div className="absolute -top-[6px] right-4 w-3 h-3 bg-bg-card-solid border-t border-l border-white/10 rotate-45 -z-10" />
+
+            <div className="flex items-center gap-3 px-3 py-2.5 rounded-sm">
+              <div className="w-9 h-9 rounded-full bg-border-glow border border-border-focus flex items-center justify-center text-accent-cyan shrink-0 shadow-[0_0_10px_var(--color-border-glow)]">
+                <User size={18} />
+              </div>
+              <div className="flex flex-col gap-0.5 min-w-0">
+                <span className="font-display text-[0.85rem] font-bold text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
+                  User
+                </span>
+                <span className="font-mono text-[0.65rem] text-text-muted tracking-wide">
+                  ML Engineer
+                </span>
+              </div>
+            </div>
+
+            <div className="h-px bg-white/5 my-1.5 mx-2" />
+
+            <button
+              type="button"
+              className="flex items-center gap-2.5 w-full px-3 py-2 border-none rounded-sm bg-transparent text-white/60 font-mono text-[0.75rem] font-medium cursor-pointer transition-colors text-left tracking-wide hover:bg-white/5 hover:text-text-primary hover:[&>svg]:text-accent-cyan active:scale-95"
+            >
+              <Settings size={14} className="shrink-0 transition-colors" />
+              <span>Settings</span>
+            </button>
+
+            <div className="h-px bg-white/5 my-1.5 mx-2" />
+
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="flex items-center gap-2.5 w-full px-3 py-2 border-none rounded-sm bg-transparent text-white/60 font-mono text-[0.75rem] font-medium cursor-pointer transition-colors text-left tracking-wide hover:bg-red-500/10 hover:text-red-400 hover:[&>svg]:text-red-400 hover:[&>svg]:drop-shadow-[0_0_6px_rgba(239,68,68,0.3)] active:scale-95"
+            >
+              <LogOut size={14} className="shrink-0 transition-all" />
+              <span>Log Out</span>
+            </button>
+          </div>
+        </div>
       </div>
     </nav>
   );
