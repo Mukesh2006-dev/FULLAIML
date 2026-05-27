@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -8,9 +8,7 @@ import {
   BrainCircuit,
   LogOut,
   Database,
-  User,
-  Settings,
-  Moon
+  User
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -29,12 +27,16 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
+    const scrollContainer = document.getElementById("main-scroll-container");
+    const target = scrollContainer || window;
+    
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled((scrollContainer ? scrollContainer.scrollTop : window.scrollY) > 20);
     };
-    window.addEventListener("scroll", handleScroll);
+    
+    target.addEventListener("scroll", handleScroll);
     handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => target.removeEventListener("scroll", handleScroll);
   }, []);
 
   const linksContainerRef = useRef(null);
@@ -76,7 +78,8 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setProfileOpen(false);
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+    setProfileOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -84,6 +87,7 @@ const Navbar = () => {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setProfileOpen(false);
   }, [currentLocation.pathname]);
 
@@ -96,10 +100,10 @@ const Navbar = () => {
 
   return (
     <nav
-      className={`fixed left-1/2 -translate-x-1/2 z-50 flex items-center justify-between backdrop-blur-2xl backdrop-saturate-[1.6] transition-all duration-700 ease-out w-full sm:bottom-auto bottom-4 sm:top-auto ${
+      className={`relative mx-auto z-50 flex items-center justify-between backdrop-blur-2xl backdrop-saturate-[1.6] transition-all duration-700 ease-out w-full ${
         isScrolled
-          ? "sm:top-5 max-w-[850px] px-2.5 py-1.5 gap-3 rounded-full bg-transparent border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.9),0_0_20px_rgba(255,255,255,0.03),inset_0_1px_0_rgba(255,255,255,0.08)] hover:bg-white/5"
-          : "sm:top-0 max-w-full px-8 py-3 rounded-none bg-transparent border border-transparent border-b-white/5 shadow-none"
+          ? "mt-5 max-w-[850px] px-2.5 py-1.5 gap-3 rounded-full bg-transparent border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.9),0_0_20px_rgba(255,255,255,0.03),inset_0_1px_0_rgba(255,255,255,0.08)] hover:bg-white/5"
+          : "mt-0 max-w-full px-8 py-3 rounded-none bg-transparent border border-transparent border-b-white/5 shadow-none"
       } max-sm:px-1.5 max-sm:gap-1 max-sm:rounded-full max-sm:border-white/10 max-sm:bg-bg-root/80 max-sm:w-[95%]`}
     >
       <div className="flex items-center max-sm:hidden">
@@ -153,15 +157,6 @@ const Navbar = () => {
       </ul>
 
       <div className="flex items-center">
-        {/* Actions */}
-        <div className="flex items-center gap-3 mr-2 ml-1">
-          <button
-            type="button"
-            className="bg-transparent border-none text-white/60 cursor-pointer hover:text-text-primary transition-colors active:scale-95"
-          >
-            <Moon size={18} />
-          </button>
-        </div>
 
         {/* Profile */}
         <div className="relative" ref={profileRef}>
@@ -202,16 +197,6 @@ const Navbar = () => {
                 </span>
               </div>
             </div>
-
-            <div className="h-px bg-white/5 my-1.5 mx-2" />
-
-            <button
-              type="button"
-              className="flex items-center gap-2.5 w-full px-3 py-2 border-none rounded-sm bg-transparent text-white/60 font-mono text-[0.75rem] font-medium cursor-pointer transition-colors text-left tracking-wide hover:bg-white/5 hover:text-text-primary hover:[&>svg]:text-accent-cyan active:scale-95"
-            >
-              <Settings size={14} className="shrink-0 transition-colors" />
-              <span>Settings</span>
-            </button>
 
             <div className="h-px bg-white/5 my-1.5 mx-2" />
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   BrainCircuit,
@@ -50,12 +50,14 @@ const ModelTraining = () => {
         if (response.data.length > 0) {
           setSelectedDatasetId(prev => prev || response.data[0].id.toString());
         }
-      } catch (err) {
+      } catch (error) {
+        console.error(error);
         setError("Failed to fetch datasets list.");
       } finally {
         setLoadingDatasets(false);
       }
     };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDatasets();
   }, []);
 
@@ -73,7 +75,8 @@ const ModelTraining = () => {
         if (response.data.column_names?.length > 0) {
           setTargetColumn(response.data.column_names[response.data.column_names.length - 1]);
         }
-      } catch (err) {
+      } catch (error) {
+        console.error(error);
         setError("Failed to fetch columns metadata.");
       } finally {
         setLoadingColumns(false);
@@ -83,13 +86,10 @@ const ModelTraining = () => {
     fetchColumns();
   }, [selectedDatasetId]);
 
-  // Adjust default algorithm based on problem type
+  // Reset algorithm to random_forest when problem type changes
   useEffect(() => {
-    if (problemType === "classification") {
-      setAlgorithm("random_forest");
-    } else {
-      setAlgorithm("random_forest"); // Both have random_forest
-    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAlgorithm("random_forest");
   }, [problemType]);
 
   const handleDatasetChange = (e) => {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Database, Lock, Mail, ArrowRight } from "lucide-react";
 import API from "../utils/api";
@@ -17,7 +17,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await API.post("/auth/login", { email, password });
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+      const response = await API.post("/auth/login", formData, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
       localStorage.setItem("token", response.data.access_token);
       navigate("/dashboard");
     } catch (err) {

@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-  LineChart,
+
   ArrowLeft,
   Loader2,
   Image,
   RefreshCw,
   SlidersHorizontal,
-  ChevronRight,
+
   TrendingUp
 } from "lucide-react";
 import API from "../utils/api";
@@ -44,12 +44,14 @@ const Visualizations = () => {
         if (response.data.length > 0) {
           setSelectedDatasetId(prev => prev || response.data[0].id.toString());
         }
-      } catch (err) {
+      } catch (error) {
+        console.error(error);
         setError("Failed to fetch datasets list.");
       } finally {
         setLoadingDatasets(false);
       }
     };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDatasets();
   }, []);
 
@@ -69,7 +71,8 @@ const Visualizations = () => {
           setXColumn(response.data.column_names[0]);
           setYColumn(response.data.column_names[1] || response.data.column_names[0]);
         }
-      } catch (err) {
+      } catch (error) {
+        console.error(error);
         setError("Failed to fetch columns metadata for dataset.");
       } finally {
         setLoadingColumns(false);

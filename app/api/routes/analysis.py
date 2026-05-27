@@ -22,7 +22,7 @@ def generate_summary(dataset_id: int, db: Session = Depends(get_db),
 
     return generate_summary_service(
         dataset_id=dataset_id,
-        user_id=get_current_user.id,
+        user_id=current_user.id,
         db=db
     )
 

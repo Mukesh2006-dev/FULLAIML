@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Upload,
@@ -38,7 +38,8 @@ const Dashboard = () => {
       setLoading(true);
       const response = await API.get("/datasets/");
       setDatasets(response.data);
-    } catch (err) {
+    } catch (error) {
+        console.error(error);
       setError("Failed to load datasets. Please check the backend connection.");
     } finally {
       setLoading(false);
@@ -46,6 +47,7 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDatasets();
   }, []);
 
@@ -84,7 +86,8 @@ const Dashboard = () => {
       // Reset input element
       const inputEl = document.getElementById("csv-file-input");
       if (inputEl) inputEl.value = "";
-      fetchDatasets();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchDatasets();
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to upload file.");
     } finally {
@@ -118,7 +121,8 @@ const Dashboard = () => {
         isDeleting: false,
         deleteResult: response.data,
       }));
-    } catch (err) {
+    } catch (error) {
+        console.error(error);
       setDeleteModal((prev) => ({
         ...prev,
         isOpen: false,
@@ -140,7 +144,8 @@ const Dashboard = () => {
     });
     if (hadResult) {
       setSuccess("Dataset and all related resources deleted successfully.");
-      fetchDatasets();
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchDatasets();
     }
   };
 

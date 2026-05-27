@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-  SearchCode,
+
   FileSpreadsheet,
   Grid,
   TrendingUp,
@@ -42,12 +42,14 @@ const Eda = () => {
         if (response.data.length > 0) {
           setSelectedDatasetId(prev => prev || response.data[0].id.toString());
         }
-      } catch (err) {
+      } catch (error) {
+        console.error(error);
         setError("Failed to fetch datasets list.");
       } finally {
         setLoadingDatasets(false);
       }
     };
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDatasets();
   }, []);
 

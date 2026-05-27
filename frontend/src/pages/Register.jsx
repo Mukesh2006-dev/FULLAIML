@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Database, Lock, Mail, User, ArrowRight } from "lucide-react";
 import API from "../utils/api";

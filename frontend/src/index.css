@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg-root: #06080f;
-  --color-bg-body: #0a0e1a;
+  --color-bg-root: #040814;
+  --color-bg-body: #0c1020;
   --color-bg-card: rgba(14, 18, 36, 0.3);
   --color-bg-card-solid: #0e1224;
   --color-bg-card-hover: rgba(18, 24, 48, 0.4);
@@ -96,6 +96,10 @@
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold text-text-primary tracking-tight;
+    line-height: 1.5;
+    padding-top: 18px !important;
+    padding-bottom: 5px !important;
+    margin-top: -18px !important;
   }
 
   input:-webkit-autofill,
@@ -105,6 +109,11 @@
     -webkit-box-shadow: 0 0 0 1000px #0c1020 inset !important;
     -webkit-text-fill-color: theme('colors.text-primary') !important;
     transition: background-color 5000s ease-in-out 0s;
+  }
+  
+  select, option {
+    background-color: var(--color-bg-card-solid);
+    color: var(--color-text-primary);
   }
 }
 
@@ -126,3 +135,122 @@
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(90, 99, 120, 0.4); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(136, 146, 168, 0.5); }
+
+/* ── Legacy CSS variable aliases ──
+   Page-level CSS files (Dashboard.css, Preprocessing.css, Login.css, etc.)
+   still reference the old var(--bg-card), var(--border-default) names.
+   Tailwind v4 @theme prefixes them with --color-, so we bridge them here. */
+:root {
+  color-scheme: dark;
+  /* Surfaces */
+  --bg-root: var(--color-bg-root);
+  --bg-body: var(--color-bg-body);
+  --bg-card: var(--color-bg-card);
+  --bg-card-solid: var(--color-bg-card-solid);
+  --bg-card-hover: var(--color-bg-card-hover);
+  --bg-inset: var(--color-bg-inset);
+  --bg-input: var(--color-bg-input);
+
+  /* Borders */
+  --border-subtle: var(--color-border-subtle);
+  --border-default: var(--color-border-default);
+  --border-focus: var(--color-border-focus);
+  --border-glow: var(--color-border-glow);
+
+  /* Text */
+  --text-primary: var(--color-text-primary);
+  --text-secondary: var(--color-text-secondary);
+  --text-muted: var(--color-text-muted);
+  --text-cyan: var(--color-text-cyan);
+  --text-purple: var(--color-text-purple);
+  --text-warning: var(--color-text-warning);
+  --text-danger: var(--color-text-danger);
+  --text-success: var(--color-text-success);
+
+  /* Accents */
+  --accent-cyan: var(--color-accent-cyan);
+  --accent-purple: var(--color-accent-purple);
+  --accent-pink: var(--color-accent-pink);
+  --accent-green: var(--color-accent-green);
+  --accent-red: var(--color-accent-red);
+  --accent-amber: var(--color-accent-amber);
+
+  /* Gradients (not in @theme, kept as direct values) */
+  --gradient-primary: linear-gradient(135deg, #00f0ff 0%, #7c3aed 100%);
+  --gradient-card-border: linear-gradient(135deg, rgba(0, 240, 255, 0.2) 0%, rgba(124, 58, 237, 0.12) 100%);
+  --gradient-hero-text: linear-gradient(135deg, #00f0ff 0%, #a78bfa 50%, #ec4899 100%);
+  --gradient-btn-primary: linear-gradient(135deg, #00c8d4 0%, #7c3aed 100%);
+  --gradient-btn-hover: linear-gradient(135deg, #00e0ec 0%, #8b5cf6 100%);
+  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+
+  /* Shadows & Neon Glows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow-cyan: 0 0 20px rgba(0, 240, 255, 0.12), 0 0 60px rgba(0, 240, 255, 0.05);
+  --shadow-glow-purple: 0 0 20px rgba(124, 58, 237, 0.12), 0 0 60px rgba(124, 58, 237, 0.05);
+
+  /* Radii */
+  --radius-full: 9999px;
+
+  /* Transitions & Easings */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 150ms var(--ease-out);
+  --transition-normal: 250ms var(--ease-out);
+  --transition-slow: 400ms var(--ease-out);
+
+  /* Typography */
+  --font-display: "Palast", "Syne", sans-serif;
+  --font-sans: "Palast", "Inter", sans-serif;
+}
+
+/* Legacy utility classes used by page CSS files */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  position: relative;
+  transition: border-color var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+.glass-panel:hover {
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-md), var(--shadow-glow-cyan);
+}
+
+.page-enter {
+  animation: fadeInUp 0.4s var(--ease-out) both;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+button, .clickable {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+button:active, .clickable:active {
+  transform: scale(0.97);
+}
+
+.text-success { color: var(--text-success); }
+.text-danger { color: var(--text-danger); }
+.text-warning { color: var(--text-warning); }
+.text-accent { color: var(--text-cyan); }
+.text-purple { color: var(--text-purple); }
+
+.shimmer-loader {
+  background: linear-gradient(90deg, var(--bg-card-solid) 25%, #1a2040 50%, var(--bg-card-solid) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite linear;
+}
