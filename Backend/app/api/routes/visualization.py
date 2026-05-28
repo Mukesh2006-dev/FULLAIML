@@ -5,24 +5,24 @@ from Backend.app.core.database import get_db
 from Backend.app.api.dependencies import get_current_user
 from Backend.app.models.user import User
 from Backend.app.services.visualization_service import (
-    generate_histogram_service,
-    generate_correlation_heatmap_service,
-    generate_scatter_plot_service,
-    generate_bar_chart_service,
+    histogram_data_service,
+    bar_chart_data_service,
+    scatter_plot_data_service,
+    heatmap_data_service,
+    box_plot_data_service,
 )
 
 router = APIRouter(prefix="/visualizations", tags=["Visualizations"])
 
 
 @router.get("/{dataset_id}/histogram")
-def generate_histogram(
+def get_histogram_data(
     dataset_id: int,
     column: str,
     db: Session = Depends(get_db),
-    current_user:User=Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
-
-    return generate_histogram_service(
+    return histogram_data_service(
         dataset_id=dataset_id,
         column=column,
         user_id=current_user.id,
@@ -30,30 +30,30 @@ def generate_histogram(
     )
 
 
-@router.get("/{dataset_id}/heatmap")
-def generate_heatmap(
+@router.get("/{dataset_id}/bar")
+def get_bar_chart_data(
     dataset_id: int,
+    column: str,
     db: Session = Depends(get_db),
-    current_user:User=Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
-
-    return generate_correlation_heatmap_service(
+    return bar_chart_data_service(
         dataset_id=dataset_id,
+        column=column,
         user_id=current_user.id,
         db=db
     )
 
 
 @router.get("/{dataset_id}/scatter")
-def generate_scatter_plot(
+def get_scatter_plot_data(
     dataset_id: int,
     x_column: str,
     y_column: str,
     db: Session = Depends(get_db),
-    current_user:User=Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
-
-    return generate_scatter_plot_service(
+    return scatter_plot_data_service(
         dataset_id=dataset_id,
         x_column=x_column,
         y_column=y_column,
@@ -62,15 +62,27 @@ def generate_scatter_plot(
     )
 
 
-@router.get("/{dataset_id}/bar")
-def generate_bar_chart(
+@router.get("/{dataset_id}/heatmap")
+def get_heatmap_data(
+    dataset_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return heatmap_data_service(
+        dataset_id=dataset_id,
+        user_id=current_user.id,
+        db=db
+    )
+
+
+@router.get("/{dataset_id}/boxplot")
+def get_box_plot_data(
     dataset_id: int,
     column: str,
     db: Session = Depends(get_db),
-    current_user:User=Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
-
-    return generate_bar_chart_service(
+    return box_plot_data_service(
         dataset_id=dataset_id,
         column=column,
         user_id=current_user.id,
