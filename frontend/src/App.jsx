@@ -12,7 +12,7 @@ const Eda = lazy(() => import("./pages/EDA"));
 const Visualizations = lazy(() => import("./pages/Visualizations"));
 const ModelTraining = lazy(() => import("./pages/ModelTraining"));
 
-// Simple route protector that renders Layout and Outlet
+// Simple route protector that renders Layout and Outlet with its own Suspense
 const ProtectedRoute = () => {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -20,25 +20,36 @@ const ProtectedRoute = () => {
   }
   return (
     <Layout>
-      <Outlet />
+      <Suspense fallback={<SkeletonLoader />}>
+        <Outlet />
+      </Suspense>
     </Layout>
   );
 };
 
-// Loading fallback component
-const PageLoader = () => (
-  <div className="flex h-screen w-screen items-center justify-center bg-gray-900">
-    <div className="flex flex-col items-center gap-4">
-      <div className="h-12 w-12 animate-spin rounded-full border-4 border-indigo-500 border-t-transparent"></div>
-      <p className="text-lg font-medium text-indigo-400">Loading...</p>
+// Skeleton loading fallback for protected pages
+const SkeletonLoader = () => (
+  <div className="w-full h-full p-4 md:p-8 flex flex-col gap-8 animate-pulse">
+    <div className="h-12 w-1/3 max-w-[300px] bg-white/10 rounded-md"></div>
+    
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="h-[400px] bg-bg-card backdrop-blur-md rounded-xl border border-white/5 shadow-md"></div>
+      <div className="h-[400px] bg-bg-card backdrop-blur-md rounded-xl border border-white/5 shadow-md hidden lg:block"></div>
     </div>
+  </div>
+);
+
+// Global loader for initial page load (Login/Register)
+const GlobalLoader = () => (
+  <div className="flex h-screen w-screen items-center justify-center bg-bg-root">
+    <div className="w-12 h-12 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin"></div>
   </div>
 );
 
 function App() {
   return (
     <Router>
-      <Suspense fallback={<PageLoader />}>
+      <Suspense fallback={<GlobalLoader />}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />

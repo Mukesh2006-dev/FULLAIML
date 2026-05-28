@@ -48,7 +48,7 @@ const ChartTooltip = ({ active, payload, label, xKey, yKey }) => {
 /* ─── Heatmap (custom SVG) ─── */
 const HeatmapChart = ({ data, columns }) => {
   const size = columns.length;
-  const cellSize = Math.min(50, Math.floor(500 / size));
+  const cellSize = Math.min(65, Math.floor(800 / size));
 
   const colorScale = (value) => {
     // -1 (blue) → 0 (dark) → +1 (cyan/green)
@@ -113,7 +113,7 @@ const HeatmapChart = ({ data, columns }) => {
                   y={yi * cellSize}
                   width={cellSize - 1}
                   height={cellSize - 1}
-                  rx={3}
+                  rx={8}
                   fill={colorScale(cell.value)}
                   className="heatmap-cell"
                 >
@@ -355,7 +355,7 @@ const Visualizations = () => {
     switch (chart_type) {
       case "histogram":
         return (
-          <ResponsiveContainer width="100%" height={380}>
+          <ResponsiveContainer width="100%" height={550}>
             <BarChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 60 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.gridLine} />
               <XAxis
@@ -379,7 +379,7 @@ const Visualizations = () => {
 
       case "bar":
         return (
-          <ResponsiveContainer width="100%" height={380}>
+          <ResponsiveContainer width="100%" height={550}>
             <BarChart data={data} margin={{ top: 20, right: 30, left: 10, bottom: 60 }} layout="vertical">
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.gridLine} horizontal={false} />
               <XAxis type="number" tick={{ fill: CHART_COLORS.tickText, fontSize: 12 }} />
@@ -401,7 +401,7 @@ const Visualizations = () => {
 
       case "scatter":
         return (
-          <ResponsiveContainer width="100%" height={380}>
+          <ResponsiveContainer width="100%" height={550}>
             <ScatterChart margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke={CHART_COLORS.gridLine} />
               <XAxis
@@ -435,7 +435,16 @@ const Visualizations = () => {
                 }}
                 cursor={{ strokeDasharray: "3 3" }}
               />
-              <Scatter data={data} fill={CHART_COLORS.cyan} fillOpacity={0.6} />
+              <Scatter 
+                data={data} 
+                fill={CHART_COLORS.cyan} 
+                fillOpacity={0.35} 
+                stroke={CHART_COLORS.cyan}
+                strokeWidth={1.5}
+                strokeOpacity={0.8}
+                animationDuration={1500}
+                animationEasing="ease-out"
+              />
             </ScatterChart>
           </ResponsiveContainer>
         );
