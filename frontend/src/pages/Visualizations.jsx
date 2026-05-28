@@ -1,18 +1,123 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-
   ArrowLeft,
   Loader2,
   Image,
   RefreshCw,
   SlidersHorizontal,
-
   TrendingUp
 } from "lucide-react";
+import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
 import "./Visualizations.css";
 
+/* ─── Color Palette ─── */
+const CHART_COLORS = {
+  cyan: "#00f0ff",
+  cyanDim: "rgba(0,240,255,0.6)",
+  purple: "#7c3aed",
+  purpleDim: "rgba(124,58,237,0.6)",
+  pink: "#ec4899",
+  green: "#10b981",
+  amber: "#f59e0b",
+  gridLine: "rgba(255,255,255,0.06)",
+  tickText: "#8892a8",
+  tooltipBg: "rgba(12,16,32,0.95)",
+  tooltipBorder: "rgba(0,240,255,0.2)",
+};
+
+/* ─── Heatmap (ECharts) ─── */
+const HeatmapChart = ({ data, columns }) => {
+  const heatmapData = data.map(item => {
+    const xIndex = columns.indexOf(item.x);
+    const yIndex = columns.indexOf(item.y);
+    return [xIndex, yIndex, Number(item.value.toFixed(2))];
+  }).filter(item => item[0] !== -1 && item[1] !== -1);
+
+  const option = {
+    tooltip: {
+      position: 'top',
+      backgroundColor: CHART_COLORS.tooltipBg,
+      borderColor: CHART_COLORS.tooltipBorder,
+      borderWidth: 1,
+      padding: 10,
+      textStyle: { color: CHART_COLORS.tickText, fontFamily: '"JetBrains Mono", monospace', fontSize: 12 },
+      formatter: function (params) {
+        const xName = columns[params.value[0]];
+        const yName = columns[params.value[1]];
+        const val = params.value[2];
+        return `<div style="margin-bottom:4px;color:${CHART_COLORS.cyan}">${xName} × ${yName}</div>
+                <div style="color:#fff;font-weight:bold">Correlation: ${val}</div>`;
+      }
+    },
+    grid: { top: 40, bottom: 100, left: 120, right: 80 },
+    xAxis: {
+      type: 'category',
+      data: columns,
+      splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.01)', 'rgba(255,255,255,0)'] } },
+      axisLabel: { color: CHART_COLORS.tickText, interval: 0, rotate: 45, fontSize: 11 },
+      axisLine: { lineStyle: { color: CHART_COLORS.gridLine } }
+    },
+    yAxis: {
+      type: 'category',
+      data: columns,
+      splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.01)', 'rgba(255,255,255,0)'] } },
+      axisLabel: { color: CHART_COLORS.tickText, fontSize: 11 },
+      axisLine: { lineStyle: { color: CHART_COLORS.gridLine } }
+    },
+    visualMap: {
+      min: -1,
+      max: 1,
+      calculable: true,
+      orient: 'vertical',
+      right: 0,
+      top: 'center',
+      itemHeight: 200,
+      inRange: {
+        color: [CHART_COLORS.purple, '#0c1020', CHART_COLORS.cyan]
+      },
+      textStyle: { color: CHART_COLORS.tickText }
+    },
+    series: [{
+      name: 'Correlation',
+      type: 'heatmap',
+      data: heatmapData,
+      label: {
+        show: columns.length < 15,
+        color: '#fff',
+        fontSize: 10
+      },
+      itemStyle: {
+        borderRadius: 6,
+        borderColor: '#0c1020',
+        borderWidth: 2
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 14,
+          shadowColor: 'rgba(0, 240, 255, 0.6)'
+        }
+      }
+    }]
+  };
+
+  const chartHeight = Math.max(500, columns.length * 40 + 150);
+
+  return (
+    <div style={{ width: '100%', height: `${chartHeight}px`, display: 'flex', justifyContent: 'center' }}>
+      <ReactECharts 
+        option={option} 
+        style={{ height: '100%', width: '100%', maxWidth: '1000px' }} 
+        opts={{ renderer: 'canvas' }} 
+      />
+    </div>
+  );
+};
+
+/* ═══════════════════════════════════════════════════════
+   Main Visualizations Page
+   ═══════════════════════════════════════════════════════ */
 const Visualizations = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -110,6 +215,10 @@ const Visualizations = () => {
         });
       } else if (plotType === "heatmap") {
         response = await API.get(`/visualizations/${selectedDatasetId}/heatmap`);
+      } else if (plotType === "boxplot") {
+        response = await API.get(`/visualizations/${selectedDatasetId}/boxplot`, {
+          params: { column }
+        });
       }
 
       setChartResult(response.data);
@@ -119,6 +228,246 @@ const Visualizations = () => {
       );
     } finally {
       setLoadingChart(false);
+    }
+  };
+
+  /* ─── Chart renderer ─── */
+  const renderChart = () => {
+    if (!chartResult) return null;
+    const { chart_type, data } = chartResult;
+
+    switch (chart_type) {
+      case "histogram": {
+        const option = {
+          tooltip: {
+            trigger: 'axis',
+            backgroundColor: CHART_COLORS.tooltipBg,
+            borderColor: CHART_COLORS.tooltipBorder,
+            borderWidth: 1,
+            textStyle: { color: CHART_COLORS.tickText, fontFamily: '"JetBrains Mono", monospace', fontSize: 12 },
+            axisPointer: { type: 'shadow' }
+          },
+          grid: { top: 20, right: 30, left: 50, bottom: 80 },
+          xAxis: {
+            type: 'category',
+            data: data.map(d => d.bin),
+            axisLabel: { color: CHART_COLORS.tickText, fontSize: 11, rotate: 35, interval: 0 },
+            axisLine: { lineStyle: { color: CHART_COLORS.gridLine } }
+          },
+          yAxis: {
+            type: 'value',
+            splitLine: { lineStyle: { color: CHART_COLORS.gridLine, type: 'dashed' } },
+            axisLabel: { color: CHART_COLORS.tickText, fontSize: 12 }
+          },
+          series: [{
+            name: 'Count',
+            type: 'bar',
+            data: data.map(d => d.count),
+            itemStyle: {
+              color: {
+                type: 'linear',
+                x: 0, y: 0, x2: 0, y2: 1,
+                colorStops: [{ offset: 0, color: CHART_COLORS.cyan }, { offset: 1, color: CHART_COLORS.purpleDim }]
+              },
+              borderRadius: [4, 4, 0, 0]
+            },
+            large: true
+          }]
+        };
+        return (
+          <div style={{ width: '100%', height: '550px' }}>
+            <ReactECharts option={option} style={{ height: '100%', width: '100%' }} opts={{ renderer: 'canvas' }} />
+          </div>
+        );
+      }
+
+      case "bar": {
+        const option = {
+          tooltip: {
+            trigger: 'axis',
+            backgroundColor: CHART_COLORS.tooltipBg,
+            borderColor: CHART_COLORS.tooltipBorder,
+            borderWidth: 1,
+            textStyle: { color: CHART_COLORS.tickText, fontFamily: '"JetBrains Mono", monospace', fontSize: 12 },
+            axisPointer: { type: 'shadow' }
+          },
+          grid: { top: 20, right: 30, left: 130, bottom: 40 },
+          xAxis: {
+            type: 'value',
+            splitLine: { lineStyle: { color: CHART_COLORS.gridLine, type: 'dashed' } },
+            axisLabel: { color: CHART_COLORS.tickText, fontSize: 12 }
+          },
+          yAxis: {
+            type: 'category',
+            data: data.map(d => d.label),
+            axisLabel: { color: CHART_COLORS.tickText, fontSize: 11, width: 120, overflow: 'truncate' },
+            axisLine: { lineStyle: { color: CHART_COLORS.gridLine } }
+          },
+          series: [{
+            name: 'Count',
+            type: 'bar',
+            data: data.map(d => d.count),
+            itemStyle: {
+              color: {
+                type: 'linear',
+                x: 0, y: 0, x2: 1, y2: 0,
+                colorStops: [{ offset: 0, color: CHART_COLORS.purpleDim }, { offset: 1, color: CHART_COLORS.cyan }]
+              },
+              borderRadius: [0, 4, 4, 0]
+            },
+            large: true
+          }]
+        };
+        return (
+          <div style={{ width: '100%', height: '550px' }}>
+            <ReactECharts option={option} style={{ height: '100%', width: '100%' }} opts={{ renderer: 'canvas' }} />
+          </div>
+        );
+      }
+
+      case "scatter": {
+        const scatterData = data.map(d => [d.x, d.y]);
+        
+        const option = {
+          tooltip: {
+            trigger: 'item',
+            backgroundColor: CHART_COLORS.tooltipBg,
+            borderColor: CHART_COLORS.tooltipBorder,
+            borderWidth: 1,
+            padding: 10,
+            textStyle: { color: CHART_COLORS.tickText, fontFamily: '"JetBrains Mono", monospace', fontSize: 12 },
+            formatter: function (params) {
+              return `<div style="margin-bottom:4px;color:${CHART_COLORS.cyan}">${chartResult.x_column}: <strong>${params.value[0]}</strong></div>
+                      <div style="color:${CHART_COLORS.purple}">${chartResult.y_column}: <strong>${params.value[1]}</strong></div>`;
+            }
+          },
+          grid: { top: 20, right: 30, left: 60, bottom: 40 },
+          xAxis: {
+            name: chartResult.x_column,
+            nameLocation: 'middle',
+            nameGap: 25,
+            type: 'value',
+            scale: true,
+            splitLine: { lineStyle: { color: CHART_COLORS.gridLine, type: 'dashed' } },
+            axisLabel: { color: CHART_COLORS.tickText, fontSize: 11 },
+            nameTextStyle: { color: CHART_COLORS.tickText, fontSize: 12 }
+          },
+          yAxis: {
+            name: chartResult.y_column,
+            nameLocation: 'middle',
+            nameGap: 40,
+            type: 'value',
+            scale: true,
+            splitLine: { lineStyle: { color: CHART_COLORS.gridLine, type: 'dashed' } },
+            axisLabel: { color: CHART_COLORS.tickText, fontSize: 11 },
+            nameTextStyle: { color: CHART_COLORS.tickText, fontSize: 12 }
+          },
+          series: [{
+            symbolSize: 6,
+            data: scatterData,
+            type: 'scatter',
+            itemStyle: {
+              color: CHART_COLORS.cyanDim,
+              opacity: 0.8,
+              borderColor: CHART_COLORS.cyan,
+              borderWidth: 1.5
+            },
+            large: true, // Enables Canvas optimization for large data points
+            largeThreshold: 1000
+          }]
+        };
+
+        return (
+          <div style={{ width: '100%', height: '550px' }}>
+            <ReactECharts 
+              option={option} 
+              style={{ height: '100%', width: '100%' }} 
+              opts={{ renderer: 'canvas' }} 
+            />
+          </div>
+        );
+      }
+
+      case "heatmap":
+        return <HeatmapChart data={data} columns={chartResult.columns} />;
+
+      case "boxplot": {
+        const { min, q1, median, q3, max, mean } = data;
+        const boxData = [[min, q1, median, q3, max]];
+        
+        const option = {
+          tooltip: {
+            trigger: 'item',
+            backgroundColor: CHART_COLORS.tooltipBg,
+            borderColor: CHART_COLORS.tooltipBorder,
+            borderWidth: 1,
+            textStyle: { color: CHART_COLORS.tickText, fontFamily: '"JetBrains Mono", monospace', fontSize: 12 },
+            formatter: function (params) {
+              if (params.componentType === 'series' && params.seriesName === 'Boxplot') {
+                return `<div style="color:${CHART_COLORS.cyan};margin-bottom:4px">Box Plot Statistics</div>
+                        Min: <strong>${min.toFixed(2)}</strong><br/>
+                        Q1: <strong>${q1.toFixed(2)}</strong><br/>
+                        Median: <strong style="color:${CHART_COLORS.pink}">${median.toFixed(2)}</strong><br/>
+                        Q3: <strong>${q3.toFixed(2)}</strong><br/>
+                        Max: <strong>${max.toFixed(2)}</strong>`;
+              }
+              return params.name;
+            }
+          },
+          grid: { top: 60, right: 30, left: 30, bottom: 60 },
+          xAxis: {
+            type: 'value',
+            min: Math.floor(min - (max - min) * 0.1),
+            max: Math.ceil(max + (max - min) * 0.1),
+            splitLine: { lineStyle: { color: CHART_COLORS.gridLine, type: 'dashed' } },
+            axisLabel: { color: CHART_COLORS.tickText, fontSize: 12 }
+          },
+          yAxis: {
+            type: 'category',
+            data: [''],
+            axisLabel: { show: false },
+            axisLine: { show: false },
+            splitLine: { show: false }
+          },
+          series: [
+            {
+              name: 'Boxplot',
+              type: 'boxplot',
+              data: boxData,
+              itemStyle: {
+                color: 'rgba(0,240,255,0.08)',
+                borderColor: CHART_COLORS.cyan,
+                borderWidth: 2
+              },
+              boxWidth: [30, 80]
+            },
+            {
+              name: 'Mean',
+              type: 'scatter',
+              data: [[mean, 0]],
+              symbol: 'circle',
+              symbolSize: 12,
+              itemStyle: {
+                color: CHART_COLORS.amber,
+                borderColor: 'rgba(0,0,0,0.5)',
+                borderWidth: 1
+              },
+              tooltip: {
+                formatter: `Mean: <strong>${mean.toFixed(2)}</strong>`
+              }
+            }
+          ]
+        };
+
+        return (
+          <div style={{ width: '100%', height: '350px' }}>
+            <ReactECharts option={option} style={{ height: '100%', width: '100%' }} opts={{ renderer: 'canvas' }} />
+          </div>
+        );
+      }
+
+      default:
+        return <p style={{ color: CHART_COLORS.tickText }}>Unsupported chart type: {chart_type}</p>;
     }
   };
 
@@ -176,7 +525,8 @@ const Visualizations = () => {
                   { id: "histogram", label: "Histogram" },
                   { id: "bar", label: "Bar Chart" },
                   { id: "scatter", label: "Scatter Plot" },
-                  { id: "heatmap", label: "Heatmap" }
+                  { id: "heatmap", label: "Heatmap" },
+                  { id: "boxplot", label: "Box Plot" }
                 ].map((type) => (
                   <button
                     key={type.id}
@@ -202,8 +552,8 @@ const Visualizations = () => {
             ) : (
               columns.length > 0 && (
                 <div className="column-selections-area page-enter">
-                  {/* Histogram & Bar Chart Options */}
-                  {(plotType === "histogram" || plotType === "bar") && (
+                  {/* Histogram, Bar & Box Plot Options */}
+                  {(plotType === "histogram" || plotType === "bar" || plotType === "boxplot") && (
                     <div className="select-group">
                       <label htmlFor="vis-single-col">Target Column</label>
                       <select
@@ -219,8 +569,8 @@ const Visualizations = () => {
                           </option>
                         ))}
                       </select>
-                      {plotType === "histogram" && (
-                        <span className="field-hint">Note: Histograms require numeric features.</span>
+                      {(plotType === "histogram" || plotType === "boxplot") && (
+                        <span className="field-hint">Note: This chart type requires numeric features.</span>
                       )}
                     </div>
                   )}
@@ -300,16 +650,12 @@ const Visualizations = () => {
             <div className="rendering-placeholder">
               <RefreshCw className="animate-spin render-spin-ico" size={40} />
               <h3>Compiling Data Graphics…</h3>
-              <p>Aggregating records and building plot outputs via the matplotlib server.</p>
+              <p>Aggregating records and building interactive chart.</p>
             </div>
           ) : chartResult ? (
             <div className="render-output page-enter">
-              <div className="chart-wrapper glass-panel">
-                <img
-                  src={`http://localhost:8000${chartResult.chart_url}`}
-                  alt={`${plotType} chart`}
-                  className="rendered-image"
-                />
+              <div className="chart-wrapper">
+                {renderChart()}
               </div>
 
               <div className="chart-metadata">
@@ -321,7 +667,7 @@ const Visualizations = () => {
                 <div className="meta-stats-list">
                   <div className="meta-stat-row">
                     <span>Chart Type</span>
-                    <strong>{plotType.toUpperCase()}</strong>
+                    <strong>{chartResult.chart_type?.toUpperCase()}</strong>
                   </div>
                   {chartResult.column && (
                     <div className="meta-stat-row">
@@ -341,24 +687,54 @@ const Visualizations = () => {
                       <strong>{chartResult.y_column}</strong>
                     </div>
                   )}
+                  {chartResult.chart_type === "histogram" && chartResult.data && (
+                    <div className="meta-stat-row">
+                      <span>Total Records</span>
+                      <strong>{chartResult.data.reduce((s, d) => s + d.count, 0).toLocaleString()}</strong>
+                    </div>
+                  )}
+                  {chartResult.chart_type === "scatter" && chartResult.data && (
+                    <div className="meta-stat-row">
+                      <span>Data Points</span>
+                      <strong>{chartResult.data.length.toLocaleString()}</strong>
+                    </div>
+                  )}
+                  {chartResult.chart_type === "heatmap" && chartResult.columns && (
+                    <div className="meta-stat-row">
+                      <span>Numeric Columns</span>
+                      <strong>{chartResult.columns.length}</strong>
+                    </div>
+                  )}
+                  {chartResult.chart_type === "boxplot" && chartResult.data && (
+                    <>
+                      <div className="meta-stat-row">
+                        <span>IQR (Q3 − Q1)</span>
+                        <strong>{(chartResult.data.q3 - chartResult.data.q1).toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong>
+                      </div>
+                      <div className="meta-stat-row">
+                        <span>Range</span>
+                        <strong>{(chartResult.data.max - chartResult.data.min).toLocaleString(undefined, { maximumFractionDigits: 2 })}</strong>
+                      </div>
+                    </>
+                  )}
                 </div>
 
-                {chartResult.top_values && (
+                {chartResult.chart_type === "bar" && chartResult.data && (
                   <div className="bar-chart-stats">
                     <h5>Top Category Counts</h5>
                     <div className="bar-stat-table">
-                      {Object.entries(chartResult.top_values).map(([val, cnt]) => (
-                        <div key={val} className="bar-stat-row">
-                          <span className="bar-lbl">{val || "[empty]"}</span>
+                      {chartResult.data.map((item) => (
+                        <div key={item.label} className="bar-stat-row">
+                          <span className="bar-lbl">{item.label || "[empty]"}</span>
                           <div className="bar-bar-track">
                             <div
                               className="bar-bar-fill"
                               style={{
-                                width: `${(cnt / Math.max(...Object.values(chartResult.top_values))) * 100}%`
+                                width: `${(item.count / Math.max(...chartResult.data.map(d => d.count))) * 100}%`
                               }}
                             ></div>
                           </div>
-                          <span className="bar-cnt">{cnt}</span>
+                          <span className="bar-cnt">{item.count}</span>
                         </div>
                       ))}
                     </div>

@@ -23,6 +23,14 @@ dist-ssr
 *.sln
 *.sw?
 
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Vite cache
+.vite
+
 # React Doctor
 .react-doctor
 .react-doctor/

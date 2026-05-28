@@ -15,27 +15,7 @@
   margin-bottom: 2rem;
 }
 
-.back-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 1rem;
-  background: var(--bg-inset);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  color: var(--text-secondary);
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  transition: all var(--transition-fast);
-}
 
-.back-btn:hover {
-  color: var(--text-primary);
-  border-color: var(--border-glow);
-  background: rgba(0, 240, 255, 0.03);
-}
 
 .preprocess-title-section h1 {
   font-family: var(--font-display);

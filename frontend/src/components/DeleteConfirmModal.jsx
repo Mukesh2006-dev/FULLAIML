@@ -34,16 +34,7 @@ const DeleteConfirmModal = ({
         className="relative w-full max-w-[460px] m-4 p-0 rounded-xl border border-red-500/10 shadow-[0_24px_80px_rgba(0,0,0,0.7),_0_0_40px_rgba(239,68,68,0.06)] overflow-hidden bg-bg-card backdrop-blur-md animate-modal-slide-in sm:max-w-[95vw]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button */}
-        {!isDeleting && (
-          <button 
-            type="button" 
-            className="absolute top-4 right-4 z-10 bg-white/5 border border-white/5 rounded-sm text-text-muted p-1.5 flex items-center justify-center transition-all duration-150 ease-out cursor-pointer hover:text-text-primary hover:border-border-glow hover:bg-white/5 active:scale-95" 
-            onClick={onClose}
-          >
-            <X size={18} />
-          </button>
-        )}
+        {/* Close button removed */}
 
         {/* Deleting in progress */}
         {isDeleting && (
