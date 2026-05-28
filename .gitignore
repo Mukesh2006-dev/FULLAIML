@@ -11,3 +11,10 @@ Backend/storage/cleaned/*
 Backend/storage/models/*
 Backend/storage/charts/*
 !Backend/storage/**/.gitkeep
+
+# Root storage data
+storage/uploads/*
+storage/cleaned/*
+storage/models/*
+storage/charts/*
+!storage/**/.gitkeep
