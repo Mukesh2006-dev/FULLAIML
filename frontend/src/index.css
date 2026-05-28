@@ -140,11 +140,16 @@
   }
 }
 
-/* Custom scrollbars */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(90, 99, 120, 0.4); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(136, 146, 168, 0.5); }
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
 
 /* ── Legacy CSS variable aliases ──
    Page-level CSS files (Dashboard.css, Preprocessing.css, Login.css, etc.)

@@ -1,7 +1,13 @@
 venv/
 __pycache__/
 .env
-storage/uploads/*
-storage/cleaned/*
-storage/models/*
-storage/charts/*
+node_modules/
+frontend/.vite/
+frontend/dist/
+
+# Backend storage data
+Backend/storage/uploads/*
+Backend/storage/cleaned/*
+Backend/storage/models/*
+Backend/storage/charts/*
+!Backend/storage/**/.gitkeep
