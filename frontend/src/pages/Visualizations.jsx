@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
@@ -8,9 +8,10 @@ import {
   SlidersHorizontal,
   TrendingUp
 } from "lucide-react";
-import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
 import "./Visualizations.css";
+
+const ReactECharts = lazy(() => import("echarts-for-react"));
 
 /* ─── Color Palette ─── */
 const CHART_COLORS = {
@@ -655,7 +656,14 @@ const Visualizations = () => {
           ) : chartResult ? (
             <div className="render-output page-enter">
               <div className="chart-wrapper">
-                {renderChart()}
+                <Suspense fallback={
+                  <div className="rendering-placeholder" style={{ height: '550px' }}>
+                    <Loader2 className="animate-spin render-spin-ico" size={40} />
+                    <h3>Loading Chart Engine...</h3>
+                  </div>
+                }>
+                  {renderChart()}
+                </Suspense>
               </div>
 
               <div className="chart-metadata">

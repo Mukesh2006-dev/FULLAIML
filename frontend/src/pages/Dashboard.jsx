@@ -59,6 +59,15 @@ const Dashboard = () => {
         setFile(null);
         return;
       }
+      
+      // Enforce 50MB limit
+      const MAX_FILE_SIZE = 50 * 1024 * 1024;
+      if (selectedFile.size > MAX_FILE_SIZE) {
+        setError("File size exceeds the 50MB limit.");
+        setFile(null);
+        return;
+      }
+
       setFile(selectedFile);
       setError("");
     }
