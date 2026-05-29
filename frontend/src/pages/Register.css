@@ -18,6 +18,18 @@
     radial-gradient(ellipse 50% 40% at 50% 50%, rgba(236, 72, 153, 0.02) 0%, transparent 50%);
 }
 
+.register-silk-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+
 /* ── Ambient Glow Circles ── */
 .register-glow-circle-1 {
   position: absolute;

@@ -123,12 +123,12 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container page-enter">
-      <div className="fixed inset-0 z-0 pointer-events-none opacity-30">
+    <>
+      <div className="register-silk-bg">
         <Silk speed={3} scale={1} color="#7c3aed" noiseIntensity={1.2} rotation={0} />
       </div>
-
-      <div className="register-card glass-panel">
+      <div className="register-container page-enter">
+        <div className="register-card glass-panel">
         <div className="register-header">
           <div className="register-logo">
             <Database size={32} />
@@ -280,6 +280,7 @@ const Register = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
