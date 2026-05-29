@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 import Layout from "./components/Layout";
 import "./App.css";
 
@@ -11,6 +12,8 @@ const Preprocessing = lazy(() => import("./pages/Preprocessing"));
 const Eda = lazy(() => import("./pages/EDA"));
 const Visualizations = lazy(() => import("./pages/Visualizations"));
 const ModelTraining = lazy(() => import("./pages/ModelTraining"));
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
 // Simple route protector that renders Layout and Outlet with its own Suspense
 const ProtectedRoute = () => {
@@ -48,25 +51,27 @@ const GlobalLoader = () => (
 
 function App() {
   return (
-    <Router>
-      <Suspense fallback={<GlobalLoader />}>
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          
-          <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/preprocessing" element={<Preprocessing />} />
-            <Route path="/eda" element={<Eda />} />
-            <Route path="/visualizations" element={<Visualizations />} />
-            <Route path="/ml-model" element={<ModelTraining />} />
-          </Route>
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <Router>
+        <Suspense fallback={<GlobalLoader />}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            
+            <Route element={<ProtectedRoute />}>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/preprocessing" element={<Preprocessing />} />
+              <Route path="/eda" element={<Eda />} />
+              <Route path="/visualizations" element={<Visualizations />} />
+              <Route path="/ml-model" element={<ModelTraining />} />
+            </Route>
 
-          {/* Fallback route */}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </Suspense>
-    </Router>
+            {/* Fallback route */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </Routes>
+        </Suspense>
+      </Router>
+    </GoogleOAuthProvider>
   );
 }
 
