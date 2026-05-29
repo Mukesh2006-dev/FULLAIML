@@ -8,8 +8,21 @@ from Backend.app.schemas.user import UserCreate, UserLogin, UserResponse, TokenR
 from Backend.app.services.auth_service import (
     register_user_service,
     login_user_service,
+    google_login_service,
+)
+from Backend.app.schemas.user import (
+    UserCreate,
+    UserLogin,
+    UserResponse,
+    TokenResponse,
+    GoogleAuthRequest,
 )
 
+from Backend.app.services.auth_service import (
+    register_user_service,
+    login_user_service,
+    google_login_service,
+)
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
@@ -32,6 +45,15 @@ def login(
     )
     return login_user_service(user_data=user_data, db=db)
 
+@router.post("/google-login", response_model=TokenResponse)
+def google_login(
+    payload: GoogleAuthRequest,
+    db: Session = Depends(get_db)
+):
+    return google_login_service(
+        token=payload.token,
+        db=db
+    )
 @router.get("/me", response_model=UserResponse)
 def get_my_profile(
     current_user: User = Depends(get_current_user)
