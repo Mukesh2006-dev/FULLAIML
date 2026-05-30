@@ -14,6 +14,9 @@ class User(Base):
     email = Column(String, unique=True, nullable=False)
 
     hashed_password = Column(String, nullable=False)
+    name = Column(String, nullable=True)
+    phone_number = Column(String, nullable=True)
+    profile_picture = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
