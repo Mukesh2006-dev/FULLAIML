@@ -1,8 +1,7 @@
 import secrets
+import requests
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from google.auth.transport import requests
-from google.oauth2 import id_token 
 
 
 from Backend.app.models.user import User
@@ -57,12 +56,19 @@ def login_user_service(user_data: UserLogin, db: Session):
 
 def google_login_service(token: str, db: Session):
     try:
-        google_user = id_token.verify_oauth2_token(
-            token,
-            requests.Request(),
-            settings.google_client_id
+        response = requests.get(
+            "https://www.googleapis.com/oauth2/v3/userinfo",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=10.0
         )
-    except Exception:
+
+        if response.status_code != 200:
+            raise ValueError(f"Google API returned {response.status_code}")
+
+        google_user = response.json()
+
+    except Exception as e:
+        print(f"Google token error: {e}")
         raise HTTPException(status_code=401, detail="Invalid Google token")
 
     email = google_user.get("email")
@@ -77,7 +83,6 @@ def google_login_service(token: str, db: Session):
 
     if existing_user:
         access_token = create_access_token(data={"sub": str(existing_user.id)})
-
         return {
             "access_token": access_token,
             "token_type": "bearer"
