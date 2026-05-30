@@ -71,6 +71,8 @@ const HeatmapChart = ({ data, columns }) => {
       min: -1,
       max: 1,
       calculable: true,
+      realtime: false,
+      hoverLink: false,
       orient: 'vertical',
       right: 0,
       top: 'center',
@@ -107,10 +109,10 @@ const HeatmapChart = ({ data, columns }) => {
 
   return (
     <div style={{ width: '100%', height: `${chartHeight}px`, display: 'flex', justifyContent: 'center' }}>
-      <ReactECharts 
-        option={option} 
-        style={{ height: '100%', width: '100%', maxWidth: '1000px' }} 
-        opts={{ renderer: 'canvas' }} 
+      <ReactECharts
+        option={option}
+        style={{ height: '100%', width: '100%', maxWidth: '1000px' }}
+        opts={{ renderer: 'canvas' }}
       />
     </div>
   );
@@ -157,7 +159,7 @@ const Visualizations = () => {
         setLoadingDatasets(false);
       }
     };
-     
+
     fetchDatasets();
   }, []);
 
@@ -328,7 +330,7 @@ const Visualizations = () => {
 
       case "scatter": {
         const scatterData = data.map(d => [d.x, d.y]);
-        
+
         const option = {
           tooltip: {
             trigger: 'item',
@@ -380,10 +382,10 @@ const Visualizations = () => {
 
         return (
           <div style={{ width: '100%', height: '550px' }}>
-            <ReactECharts 
-              option={option} 
-              style={{ height: '100%', width: '100%' }} 
-              opts={{ renderer: 'canvas' }} 
+            <ReactECharts
+              option={option}
+              style={{ height: '100%', width: '100%' }}
+              opts={{ renderer: 'canvas' }}
             />
           </div>
         );
@@ -395,7 +397,7 @@ const Visualizations = () => {
       case "boxplot": {
         const { min, q1, median, q3, max, mean } = data;
         const boxData = [[min, q1, median, q3, max]];
-        
+
         const option = {
           tooltip: {
             trigger: 'item',
