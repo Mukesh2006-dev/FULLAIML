@@ -25,7 +25,8 @@ def register_user_service(user_data: UserCreate, db: Session):
 
     new_user = User(
         username=user_data.username,
-        email=user_data.email,
+        email=user_data.email.lower(),
+        age=user_data.age,
         hashed_password=hash_password(user_data.password)
     )
 
@@ -98,9 +99,10 @@ def google_login_service(token: str, db: Session):
     random_password = secrets.token_urlsafe(32)
 
     new_user = User(
-        username=username,
-        email=email,
-        hashed_password=hash_password(random_password)
+    username=username,
+    email=email,
+    age=None,
+    hashed_password=hash_password(random_password)
     )
 
     db.add(new_user)
