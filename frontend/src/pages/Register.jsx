@@ -56,12 +56,16 @@ const Register = () => {
     onSuccess: async (tokenResponse) => {
       setGoogleLoading(true);
       setError("");
+      setSuccess("");
       try {
         const res = await API.post("/auth/google-login", {
           token: tokenResponse.access_token,
         });
         localStorage.setItem("token", res.data.access_token);
-        navigate("/dashboard");
+        setSuccess("Google sign-up successful! Redirecting...");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
       } catch (err) {
         setError(
           err.response?.data?.detail || "Google sign-up failed. Please try again."

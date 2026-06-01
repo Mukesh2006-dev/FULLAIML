@@ -19,6 +19,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
 
     try {
@@ -34,7 +36,10 @@ const Login = () => {
         password,
       });
       localStorage.setItem("token", response.data.access_token);
-      navigate("/dashboard");
+      setSuccess("Sign in successful! Redirecting...");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
     } catch (err) {
       const detail = err.response?.data?.detail;
       if (Array.isArray(detail)) {
@@ -51,12 +56,16 @@ const Login = () => {
     onSuccess: async (tokenResponse) => {
       setGoogleLoading(true);
       setError("");
+      setSuccess("");
       try {
         const res = await API.post("/auth/google-login", {
           token: tokenResponse.access_token,
         });
         localStorage.setItem("token", res.data.access_token);
-        navigate("/dashboard");
+        setSuccess("Google sign-in successful! Redirecting...");
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 1500);
       } catch (err) {
         setError(
           err.response?.data?.detail || "Google sign-in failed. Please try again."
@@ -86,6 +95,7 @@ const Login = () => {
         </div>
 
         {error && <div className="error-alert">{error}</div>}
+        {success && <div className="success-alert">{success}</div>}
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="input-group">

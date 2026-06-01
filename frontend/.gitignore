@@ -35,3 +35,7 @@ dist-ssr
 .react-doctor
 .react-doctor/
 react-doctor.log*
+
+# Skills
+skills/
+
