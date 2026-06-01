@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Upload,
@@ -34,41 +34,41 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  const fetchUser = async () => {
-    if (sessionStorage.getItem("profile_toast_shown")) return;
-    try {
-      const response = await API.get("/auth/me");
-      const user = response.data;
-      if (user.age === 0 || user.role === "user" || !user.age) {
-        setProfileIncomplete(true);
-        sessionStorage.setItem("profile_toast_shown", "true");
-        setTimeout(() => {
-          setProfileIncomplete(false);
-        }, 5000);
-      }
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const fetchDatasets = async () => {
+  const fetchDatasets = useCallback(async () => {
     try {
       setLoading(true);
       const response = await API.get("/datasets/");
       setDatasets(response.data);
     } catch (error) {
-        console.error(error);
+      console.error(error);
       setError("Failed to load datasets. Please check the backend connection.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    const fetchUser = async () => {
+      if (sessionStorage.getItem("profile_toast_shown")) return;
+      try {
+        const response = await API.get("/auth/me");
+        const user = response.data;
+        if (user.age === 0 || user.role === "user" || !user.age) {
+          setProfileIncomplete(true);
+          sessionStorage.setItem("profile_toast_shown", "true");
+          setTimeout(() => {
+            setProfileIncomplete(false);
+          }, 5000);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
     fetchUser();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDatasets();
-  }, []);
+  }, [fetchDatasets]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];

@@ -26,6 +26,7 @@ const Profile = () => {
           role: res.data.role || "user"
         });
       } catch (err) {
+        console.error(err);
         setError("Failed to fetch user profile. Please try logging in again.");
       } finally {
         setLoading(false);
@@ -74,6 +75,7 @@ const Profile = () => {
       setIsEditing(false);
       setSuccessMsg("Profile updated successfully!");
     } catch (err) {
+      console.error(err);
       setError("Failed to update profile.");
     } finally {
       setSaving(false);
@@ -126,7 +128,7 @@ const Profile = () => {
         ) : userData ? (
           <div className="profile-details-grid">
             <div className="profile-avatar-section">
-               <div className="w-24 h-24 rounded-full bg-border-glow border border-border-focus flex items-center justify-center text-accent-cyan shadow-[0_0_20px_var(--color-border-glow)] mb-4">
+               <div className="size-24 rounded-full bg-border-glow border border-border-focus flex items-center justify-center text-accent-cyan shadow-[0_0_20px_var(--color-border-glow)] mb-4">
                  <User size={48} />
                </div>
                <h2>{userData.username}</h2>
@@ -168,6 +170,15 @@ const Profile = () => {
                     <div 
                       className="relative cursor-pointer bg-bg-inset border border-white/10 rounded mt-1 w-full max-w-[250px]"
                       onClick={() => setRoleOpen(!roleOpen)}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          setRoleOpen(!roleOpen);
+                        }
+                      }}
+                      aria-expanded={roleOpen}
                     >
                       <div className="px-3 py-1.5 text-white text-sm flex items-center h-[34px]">
                         <span className={editForm.role ? "text-white" : "text-white/50"}>
@@ -176,16 +187,34 @@ const Profile = () => {
                       </div>
                       
                       {roleOpen && (
-                        <div className="absolute top-full left-0 w-full mt-1 bg-bg-card-solid border border-white/10 rounded-md shadow-[0_4px_20px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex flex-col">
+                        <div className="absolute top-full left-0 w-full mt-1 bg-bg-card-solid border border-white/10 rounded-md shadow-[0_4px_20px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex flex-col" role="menu">
                           <div 
                             className="px-4 py-2 hover:bg-accent-cyan/15 cursor-pointer text-sm text-white transition-colors"
-                            onClick={() => setEditForm({...editForm, role: "student"})}
+                            onClick={() => { setEditForm({...editForm, role: "student"}); setRoleOpen(false); }}
+                            role="menuitem"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setEditForm({...editForm, role: "student"});
+                                setRoleOpen(false);
+                              }
+                            }}
                           >
                             Student
                           </div>
                           <div 
                             className="px-4 py-2 hover:bg-accent-cyan/15 cursor-pointer text-sm text-white transition-colors"
-                            onClick={() => setEditForm({...editForm, role: "professional"})}
+                            onClick={() => { setEditForm({...editForm, role: "professional"}); setRoleOpen(false); }}
+                            role="menuitem"
+                            tabIndex={0}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter" || e.key === " ") {
+                                e.preventDefault();
+                                setEditForm({...editForm, role: "professional"});
+                                setRoleOpen(false);
+                              }
+                            }}
                           >
                             Professional
                           </div>
@@ -211,6 +240,7 @@ const Profile = () => {
                       value={editForm.age}
                       onChange={(e) => setEditForm({...editForm, age: e.target.value})}
                       placeholder="e.g. 25"
+                      aria-label="Age"
                     />
                   ) : (
                     (userData.age !== null && userData.age !== undefined) ? (
@@ -225,6 +255,7 @@ const Profile = () => {
               {isEditing && (
                 <div className="mt-6 flex justify-end">
                   <button
+                    type="button"
                     className="upload-btn"
                     onClick={handleSave}
                     disabled={saving}

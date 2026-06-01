@@ -38,7 +38,7 @@ const DeleteConfirmModal = ({
         {/* Deleting in progress */}
         {isDeleting && (
           <div className="flex flex-col items-center text-center p-10 pb-8 sm:p-8 sm:pb-6">
-            <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-5 bg-cyan-500/5 border-2 border-cyan-500/20 text-accent-cyan shadow-[0_0_24px_rgba(0,240,255,0.1)]">
+            <div className="size-[72px] rounded-full flex items-center justify-center mb-5 bg-cyan-500/5 border-2 border-cyan-500/20 text-accent-cyan shadow-[0_0_24px_rgba(0,240,255,0.1)]">
               <Loader2 size={36} className="animate-spin" />
             </div>
             <h3 className="font-display text-[1.35rem] font-extrabold text-accent-cyan mb-1.5">Cleaning Up Resources…</h3>
@@ -54,7 +54,7 @@ const DeleteConfirmModal = ({
         {/* Success result */}
         {!isDeleting && hasResult && (
           <div className="flex flex-col items-center text-center p-10 pb-8 sm:p-8 sm:pb-6">
-            <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-5 bg-emerald-500/10 border-2 border-emerald-500/25 text-emerald-400 shadow-[0_0_24px_rgba(16,185,129,0.12)] animate-success-pop">
+            <div className="size-[72px] rounded-full flex items-center justify-center mb-5 bg-emerald-500/10 border-2 border-emerald-500/25 text-emerald-400 shadow-[0_0_24px_rgba(16,185,129,0.12)] animate-success-pop">
               <CheckCircle2 size={36} />
             </div>
             <h3 className="font-display text-[1.35rem] font-extrabold text-text-primary mb-1.5">Cascade Delete Complete</h3>
@@ -100,7 +100,7 @@ const DeleteConfirmModal = ({
         {/* Confirmation prompt */}
         {!isDeleting && !hasResult && (
           <div className="flex flex-col items-center text-center p-10 pb-8 sm:p-8 sm:pb-6">
-            <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-5 bg-red-500/10 border-2 border-red-500/20 text-red-400 animate-danger-pulse">
+            <div className="size-[72px] rounded-full flex items-center justify-center mb-5 bg-red-500/10 border-2 border-red-500/20 text-red-400 animate-danger-pulse">
               <ShieldAlert size={36} />
             </div>
             <h3 className="font-display text-[1.35rem] font-extrabold text-text-primary mb-1.5">Delete Dataset?</h3>

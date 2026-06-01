@@ -178,7 +178,7 @@ const Navbar = () => {
         <div className="relative" ref={profileRef}>
           <button
             type="button"
-            className={`w-[34px] h-[34px] rounded-full border-[1.5px] border-white/15 bg-white/5 flex items-center justify-center cursor-pointer transition-all duration-300 shrink-0 relative active:scale-95 max-sm:w-8 max-sm:h-8 ${
+            className={`size-[34px] rounded-full border-[1.5px] border-white/15 bg-white/5 flex items-center justify-center cursor-pointer transition-all duration-300 shrink-0 relative active:scale-95 max-sm:size-8 ${
               profileOpen
                 ? "border-border-focus bg-border-glow text-accent-cyan shadow-[0_0_18px_var(--color-border-glow)]"
                 : "text-white/60 hover:border-border-focus hover:bg-border-glow hover:text-accent-cyan hover:shadow-[0_0_14px_var(--color-border-glow)]"
@@ -198,10 +198,10 @@ const Navbar = () => {
             }`}
           >
             {/* Arrow */}
-            <div className="absolute -top-[6px] right-4 w-3 h-3 bg-bg-card-solid border-t border-l border-white/10 rotate-45 -z-10" />
+            <div className="absolute -top-[6px] right-4 size-3 bg-bg-card-solid border-t border-l border-white/10 rotate-45 -z-10" />
 
             <div className="flex items-center gap-3 px-3 py-2.5 rounded-sm">
-              <div className="w-9 h-9 rounded-full bg-border-glow border border-border-focus flex items-center justify-center text-accent-cyan shrink-0 shadow-[0_0_10px_var(--color-border-glow)]">
+              <div className="size-9 rounded-full bg-border-glow border border-border-focus flex items-center justify-center text-accent-cyan shrink-0 shadow-[0_0_10px_var(--color-border-glow)]">
                 <User size={18} />
               </div>
               <div className="flex flex-col gap-0.5 min-w-0">

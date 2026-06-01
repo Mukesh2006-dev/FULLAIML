@@ -216,6 +216,15 @@ const Register = () => {
             <div 
               className="input-wrapper relative cursor-pointer"
               onClick={() => setRoleOpen(!roleOpen)}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  setRoleOpen(!roleOpen);
+                }
+              }}
+              aria-expanded={roleOpen}
             >
               <User className="input-icon" size={18} />
               <div 
@@ -228,16 +237,34 @@ const Register = () => {
               </div>
               
               {roleOpen && (
-                <div className="absolute top-full left-0 w-full mt-1 bg-bg-card-solid border border-white/10 rounded-md shadow-[0_4px_20px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex flex-col">
+                <div className="absolute top-full left-0 w-full mt-1 bg-bg-card-solid border border-white/10 rounded-md shadow-[0_4px_20px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex flex-col" role="menu">
                   <div 
                     className="px-4 py-2.5 hover:bg-accent-cyan/15 cursor-pointer text-sm text-white transition-colors"
-                    onClick={() => setRole("student")}
+                    onClick={() => { setRole("student"); setRoleOpen(false); }}
+                    role="menuitem"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setRole("student");
+                        setRoleOpen(false);
+                      }
+                    }}
                   >
                     Student
                   </div>
                   <div 
                     className="px-4 py-2.5 hover:bg-accent-cyan/15 cursor-pointer text-sm text-white transition-colors"
-                    onClick={() => setRole("professional")}
+                    onClick={() => { setRole("professional"); setRoleOpen(false); }}
+                    role="menuitem"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setRole("professional");
+                        setRoleOpen(false);
+                      }
+                    }}
                   >
                     Professional
                   </div>

@@ -46,7 +46,7 @@ const SkeletonLoader = () => (
 // Global loader for initial page load (Login/Register)
 const GlobalLoader = () => (
   <div className="flex h-screen w-screen items-center justify-center bg-bg-root">
-    <div className="w-12 h-12 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin"></div>
+    <div className="size-12 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin"></div>
   </div>
 );
 
