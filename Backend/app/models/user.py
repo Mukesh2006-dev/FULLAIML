@@ -13,6 +13,12 @@ class User(Base):
 
     email = Column(String, unique=True, nullable=False)
 
+    age = Column(Integer, nullable=False)
+
+    profile_picture = Column(String, nullable=True)
+
+    role = Column(String, default="user")
+    
     hashed_password = Column(String, nullable=False)
 
     created_at = Column(DateTime, default=datetime.utcnow)
