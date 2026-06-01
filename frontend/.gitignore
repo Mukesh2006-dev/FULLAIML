@@ -39,3 +39,4 @@ react-doctor.log*
 # Skills
 skills/
 
+.env
