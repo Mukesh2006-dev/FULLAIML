@@ -31,11 +31,18 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await API.post("/auth/login", {
-        email,
-        password,
+      const formData = new URLSearchParams();
+      formData.append("username", email);
+      formData.append("password", password);
+
+      const response = await API.post("/auth/login", formData, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
       });
       localStorage.setItem("token", response.data.access_token);
+      sessionStorage.removeItem("profile_toast_shown");
+      
       setSuccess("Sign in successful! Redirecting...");
       setTimeout(() => {
         navigate("/dashboard");
@@ -62,6 +69,8 @@ const Login = () => {
           token: tokenResponse.access_token,
         });
         localStorage.setItem("token", res.data.access_token);
+        sessionStorage.removeItem("profile_toast_shown");
+
         setSuccess("Google sign-in successful! Redirecting...");
         setTimeout(() => {
           navigate("/dashboard");

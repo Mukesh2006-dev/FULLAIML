@@ -8,8 +8,10 @@ import {
   BrainCircuit,
   LogOut,
   Database,
-  User
+  User,
+  Settings
 } from "lucide-react";
+import API from "../utils/api";
 
 const NAV_ITEMS = [
   { path: "/dashboard", label: "Dashboard" },
@@ -25,6 +27,21 @@ const Navbar = () => {
   const token = localStorage.getItem("token");
 
   const [isScrolled, setIsScrolled] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await API.get("/auth/me");
+        setUserData(res.data);
+      } catch (err) {
+        console.error("Failed to fetch user data:", err);
+      }
+    };
+    if (token) {
+      fetchUser();
+    }
+  }, [token]);
 
   useEffect(() => {
     const scrollContainer = document.getElementById("main-scroll-container");
@@ -78,8 +95,7 @@ const Navbar = () => {
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (profileRef.current && !profileRef.current.contains(e.target)) {
-         
-    setProfileOpen(false);
+        setProfileOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -190,15 +206,27 @@ const Navbar = () => {
               </div>
               <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="font-display text-[0.85rem] font-bold text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
-                  User
+                  {userData ? userData.username : "Loading..."}
                 </span>
-                <span className="font-mono text-[0.65rem] text-text-muted tracking-wide">
-                  ML Engineer
+                <span className="font-mono text-[0.65rem] text-text-muted tracking-wide overflow-hidden text-ellipsis">
+                  {userData ? userData.email : "Loading..."}
                 </span>
               </div>
             </div>
 
             <div className="h-px bg-white/5 my-1.5 mx-2" />
+            
+            <button
+              type="button"
+              onClick={() => {
+                setProfileOpen(false);
+                navigate("/profile");
+              }}
+              className="flex items-center gap-2.5 w-full px-3 py-2 border-none rounded-sm bg-transparent text-white/60 font-mono text-[0.75rem] font-medium cursor-pointer transition-colors text-left tracking-wide hover:bg-white/5 hover:text-white active:scale-95"
+            >
+              <Settings size={14} className="shrink-0 transition-all" />
+              <span>Profile</span>
+            </button>
 
             <button
               type="button"

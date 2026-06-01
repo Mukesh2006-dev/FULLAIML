@@ -22,7 +22,17 @@ from Backend.app.services.auth_service import (
     register_user_service,
     login_user_service,
     google_login_service,
+    update_user_profile,
 )
+from Backend.app.schemas.user import (
+    UserCreate,
+    UserLogin,
+    UserResponse,
+    TokenResponse,
+    GoogleAuthRequest,
+    UserProfileUpdate
+)
+
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
@@ -54,8 +64,21 @@ def google_login(
         token=payload.token,
         db=db
     )
+
 @router.get("/me", response_model=UserResponse)
 def get_my_profile(
     current_user: User = Depends(get_current_user)
 ):
     return current_user
+
+@router.put("/me", response_model=UserResponse)
+def update_profile(
+    update_data: UserProfileUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    return update_user_profile(
+        db=db,
+        current_user=current_user,
+        update_data=update_data.model_dump(exclude_unset=True)
+    )

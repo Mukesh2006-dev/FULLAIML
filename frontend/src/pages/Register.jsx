@@ -34,6 +34,9 @@ const getStrength = (passed) => {
 const Register = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [age, setAge] = useState("");
+  const [role, setRole] = useState("");
+  const [roleOpen, setRoleOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -62,7 +65,8 @@ const Register = () => {
           token: tokenResponse.access_token,
         });
         localStorage.setItem("token", res.data.access_token);
-        setSuccess("Google sign-up successful! Redirecting...");
+        
+        setSuccess("Google sign-in successful! Redirecting...");
         setTimeout(() => {
           navigate("/dashboard");
         }, 1500);
@@ -85,6 +89,16 @@ const Register = () => {
     setError("");
     setSuccess("");
 
+    if (!age || isNaN(age) || age < 15 || age > 80) {
+      setError("Please enter a valid age between 15 and 80");
+      return;
+    }
+
+    if (!role) {
+      setError("Please select a role");
+      return;
+    }
+
     if (!allPassed) {
       setError("Password does not meet all requirements");
       return;
@@ -101,6 +115,8 @@ const Register = () => {
       await API.post("/auth/register", {
         username,
         email,
+        age: parseInt(age, 10),
+        role: role || "user",
         password,
       });
 
@@ -174,6 +190,59 @@ const Register = () => {
                 required
                 aria-label="Email Address"
               />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="age">Age</label>
+            <div className="input-wrapper">
+              <User className="input-icon" size={18} />
+              <input
+                id="age"
+                type="number"
+                placeholder="e.g. 25"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+                required
+                min="15"
+                max="80"
+                aria-label="Age"
+              />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label htmlFor="role">Role</label>
+            <div 
+              className="input-wrapper relative cursor-pointer"
+              onClick={() => setRoleOpen(!roleOpen)}
+            >
+              <User className="input-icon" size={18} />
+              <div 
+                className="w-full bg-transparent border-none text-sm focus:outline-none focus:ring-0 px-3 py-2 flex items-center"
+                style={{ paddingLeft: '32px' }}
+              >
+                <span className={role ? "text-white" : "text-white/50"}>
+                  {role ? role.charAt(0).toUpperCase() + role.slice(1) : "Select your role"}
+                </span>
+              </div>
+              
+              {roleOpen && (
+                <div className="absolute top-full left-0 w-full mt-1 bg-bg-card-solid border border-white/10 rounded-md shadow-[0_4px_20px_rgba(0,0,0,0.5)] z-50 overflow-hidden flex flex-col">
+                  <div 
+                    className="px-4 py-2.5 hover:bg-accent-cyan/15 cursor-pointer text-sm text-white transition-colors"
+                    onClick={() => setRole("student")}
+                  >
+                    Student
+                  </div>
+                  <div 
+                    className="px-4 py-2.5 hover:bg-accent-cyan/15 cursor-pointer text-sm text-white transition-colors"
+                    onClick={() => setRole("professional")}
+                  >
+                    Professional
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
