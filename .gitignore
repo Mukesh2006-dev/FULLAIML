@@ -18,3 +18,16 @@ storage/cleaned/*
 storage/models/*
 storage/charts/*
 !storage/**/.gitkeep
+
+# One-off DB migration/debug scripts (contain credentials)
+Backend/add_age.py
+Backend/add_missing_cols.py
+Backend/add_role_only.py
+Backend/check_schema.py
+
+# IDE & OS
+.vscode/
+.idea/
+*.pyc
+.DS_Store
+Thumbs.db
