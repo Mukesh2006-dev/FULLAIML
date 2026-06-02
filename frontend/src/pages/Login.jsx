@@ -41,6 +41,9 @@ const Login = () => {
         },
       });
       localStorage.setItem("token", response.data.access_token);
+      if (response.data.is_profile_incomplete) {
+        localStorage.setItem("profile_incomplete", "true");
+      }
       sessionStorage.removeItem("profile_toast_shown");
       
       setSuccess("Sign in successful! Redirecting...");
@@ -69,6 +72,9 @@ const Login = () => {
           token: tokenResponse.access_token,
         });
         localStorage.setItem("token", res.data.access_token);
+        if (res.data.is_profile_incomplete) {
+          localStorage.setItem("profile_incomplete", "true");
+        }
         sessionStorage.removeItem("profile_toast_shown");
 
         setSuccess("Google sign-in successful! Redirecting...");

@@ -35,7 +35,7 @@ const ProtectedRoute = () => {
 const SkeletonLoader = () => (
   <div className="w-full h-full p-4 md:p-8 flex flex-col gap-8 animate-pulse">
     <div className="h-12 w-1/3 max-w-[300px] bg-white/10 rounded-md"></div>
-    
+
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <div className="h-[400px] bg-bg-card backdrop-blur-md rounded-xl border border-white/5 shadow-md"></div>
       <div className="h-[400px] bg-bg-card backdrop-blur-md rounded-xl border border-white/5 shadow-md hidden lg:block"></div>
@@ -58,7 +58,7 @@ function App() {
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            
+
             <Route element={<ProtectedRoute />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/preprocessing" element={<Preprocessing />} />

@@ -8,8 +8,11 @@ import {
   CheckCircle,
   Trophy,
   Activity,
-  Award
+  Award,
+  BarChart3,
+  ScatterChart
 } from "lucide-react";
+import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
 import "./ModelTraining.css";
 
@@ -370,15 +373,168 @@ const ModelTraining = () => {
                 <span>Validation Performance</span>
               </div>
 
-              <div className="metrics-box-grid">
-                {Object.entries(trainResult.metrics).map(([metricName, val]) => (
-                  <div key={metricName} className="metric-box-item glass-panel">
-                    <Trophy className="trophy-ico" size={24} />
-                    <span className="metric-box-lbl">{metricName.toUpperCase()}</span>
-                    <span className="metric-box-val">{val}</span>
+              {trainResult.problem_type === "classification" ? (
+                <>
+                  {/* Classification Metric Cards */}
+                  <div className="metrics-box-grid metrics-box-grid-4">
+                    {["accuracy", "precision", "recall", "f1_score"].map((key) => {
+                      const val = trainResult.metrics[key];
+                      if (val === undefined) return null;
+                      const pct = (val * 100).toFixed(1);
+                      return (
+                        <div key={key} className="metric-box-item glass-panel">
+                          <Trophy className="trophy-ico" size={24} />
+                          <span className="metric-box-lbl">{key.replace("_", " ").toUpperCase()}</span>
+                          <span className="metric-box-val">{pct}%</span>
+                          <div className="metric-bar-track">
+                            <div className="metric-bar-fill" style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ))}
-              </div>
+
+                  {/* Confusion Matrix Heatmap */}
+                  {trainResult.metrics.confusion_matrix && (
+                    <div className="chart-section glass-panel">
+                      <div className="chart-section-header">
+                        <BarChart3 size={16} />
+                        <span>Confusion Matrix</span>
+                      </div>
+                      <ReactECharts
+                        style={{ height: 360 }}
+                        option={{
+                          tooltip: {
+                            formatter: (p) => `Actual: ${p.data[1]}<br/>Predicted: ${p.data[0]}<br/>Count: <strong>${p.data[2]}</strong>`
+                          },
+                          grid: { top: 40, right: 40, bottom: 60, left: 70 },
+                          xAxis: {
+                            type: "category",
+                            data: trainResult.metrics.confusion_matrix.labels,
+                            name: "Predicted",
+                            nameLocation: "center",
+                            nameGap: 35,
+                            nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+                            axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+                            axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+                            splitLine: { show: false }
+                          },
+                          yAxis: {
+                            type: "category",
+                            data: trainResult.metrics.confusion_matrix.labels,
+                            name: "Actual",
+                            nameLocation: "center",
+                            nameGap: 50,
+                            nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+                            axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+                            axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+                            splitLine: { show: false }
+                          },
+                          visualMap: {
+                            min: 0,
+                            max: Math.max(...trainResult.metrics.confusion_matrix.heatmap_data.map(d => d.value)),
+                            calculable: true,
+                            orient: "vertical",
+                            right: 0,
+                            top: "center",
+                            inRange: { color: ["#0a1628", "#00494f", "#00c8d4", "#00f0ff"] },
+                            textStyle: { color: "#8892a8", fontSize: 10 },
+                            show: false
+                          },
+                          series: [{
+                            type: "heatmap",
+                            data: trainResult.metrics.confusion_matrix.heatmap_data.map(d => [d.predicted, d.actual, d.value]),
+                            label: { show: true, color: "#e8ecf4", fontSize: 13, fontWeight: 700 },
+                            emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,240,255,0.5)" } },
+                            itemStyle: { borderWidth: 2, borderColor: "#0c1020" }
+                          }]
+                        }}
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  {/* Regression Metric Cards */}
+                  <div className="metrics-box-grid metrics-box-grid-4">
+                    {["mae", "mse", "rmse", "r2_score"].map((key) => {
+                      const val = trainResult.metrics[key];
+                      if (val === undefined) return null;
+                      return (
+                        <div key={key} className="metric-box-item glass-panel">
+                          <Trophy className="trophy-ico" size={24} />
+                          <span className="metric-box-lbl">{key.replace("_", " ").toUpperCase()}</span>
+                          <span className="metric-box-val">{val}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Actual vs Predicted Scatter */}
+                  {trainResult.metrics.prediction_quality?.actual_vs_predicted && (
+                    <div className="chart-section glass-panel">
+                      <div className="chart-section-header">
+                        <ScatterChart size={16} />
+                        <span>Actual vs Predicted</span>
+                      </div>
+                      <ReactECharts
+                        style={{ height: 360 }}
+                        option={(() => {
+                          const pts = trainResult.metrics.prediction_quality.actual_vs_predicted;
+                          const allVals = pts.flatMap(p => [p.actual, p.predicted]);
+                          const minV = Math.min(...allVals);
+                          const maxV = Math.max(...allVals);
+                          const pad = (maxV - minV) * 0.08 || 1;
+                          return {
+                            tooltip: {
+                              formatter: (p) => `Actual: ${p.data[0].toFixed(3)}<br/>Predicted: ${p.data[1].toFixed(3)}`
+                            },
+                            grid: { top: 30, right: 30, bottom: 50, left: 60 },
+                            xAxis: {
+                              name: "Actual",
+                              nameLocation: "center",
+                              nameGap: 32,
+                              nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+                              min: minV - pad,
+                              max: maxV + pad,
+                              axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+                              axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+                              splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } }
+                            },
+                            yAxis: {
+                              name: "Predicted",
+                              nameLocation: "center",
+                              nameGap: 42,
+                              nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+                              min: minV - pad,
+                              max: maxV + pad,
+                              axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+                              axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+                              splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } }
+                            },
+                            series: [
+                              {
+                                type: "scatter",
+                                data: pts.map(p => [p.actual, p.predicted]),
+                                symbolSize: 8,
+                                itemStyle: { color: "#00f0ff", opacity: 0.8 },
+                                emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,240,255,0.6)" } }
+                              },
+                              {
+                                type: "line",
+                                data: [[minV - pad, minV - pad], [maxV + pad, maxV + pad]],
+                                lineStyle: { color: "rgba(167,139,250,0.5)", type: "dashed", width: 2 },
+                                symbol: "none",
+                                tooltip: { show: false }
+                              }
+                            ]
+                          };
+                        })()}
+                      />
+                    </div>
+                  )}
+                </>
+              )}
 
               {/* Model attributes */}
               <div className="model-report-details">

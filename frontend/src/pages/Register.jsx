@@ -66,9 +66,13 @@ const Register = () => {
         });
         localStorage.setItem("token", res.data.access_token);
         
-        setSuccess("Google sign-in successful! Redirecting...");
+        const destination = res.data.is_profile_incomplete ? "/profile" : "/dashboard";
+        setSuccess(res.data.is_new_user
+          ? "Account created! Redirecting to complete your profile..."
+          : "Google sign-in successful! Redirecting..."
+        );
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate(destination);
         }, 1500);
       } catch (err) {
         setError(

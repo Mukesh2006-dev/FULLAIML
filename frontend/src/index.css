@@ -39,7 +39,17 @@
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
-  
+
+  --gradient-hero-text: linear-gradient(135deg, #00f0ff 0%, #a78bfa 50%, #ec4899 100%);
+  --gradient-primary: linear-gradient(135deg, #00f0ff 0%, #7c3aed 100%);
+  --gradient-btn-primary: linear-gradient(135deg, #00c8d4 0%, #7c3aed 100%);
+  --gradient-btn-hover: linear-gradient(135deg, #00e0ec 0%, #8b5cf6 100%);
+
+  --shadow-glow-cyan: 0 0 20px rgba(0, 240, 255, 0.12), 0 0 60px rgba(0, 240, 255, 0.05);
+  --shadow-glow-purple: 0 0 20px rgba(124, 58, 237, 0.12), 0 0 60px rgba(124, 58, 237, 0.05);
+
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
   --animate-shimmer: shimmer 1.5s infinite linear;
   --animate-fade-in-up: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-overlay-fade-in: overlayFadeIn 0.2s ease-out both;
@@ -48,39 +58,101 @@
   --animate-success-pop: successPop 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
   --animate-progress-slide: progressSlide 1.2s ease-in-out infinite;
   --animate-result-card-in: resultCardIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
-  
+
   @keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
+    0% {
+      background-position: -200% 0;
+    }
+
+    100% {
+      background-position: 200% 0;
+    }
   }
+
   @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
+
   @keyframes overlayFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+      opacity: 0;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
+
   @keyframes modalSlideIn {
-    from { opacity: 0; transform: translateY(24px) scale(0.96); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.96);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
   }
+
   @keyframes dangerPulse {
-    0%, 100% { box-shadow: 0 0 24px rgba(239, 68, 68, 0.1); }
-    50% { box-shadow: 0 0 36px rgba(239, 68, 68, 0.2); }
+
+    0%,
+    100% {
+      box-shadow: 0 0 24px rgba(239, 68, 68, 0.1);
+    }
+
+    50% {
+      box-shadow: 0 0 36px rgba(239, 68, 68, 0.2);
+    }
   }
+
   @keyframes successPop {
-    from { transform: scale(0.6); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+    from {
+      transform: scale(0.6);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
   }
+
   @keyframes progressSlide {
-    0% { transform: translateX(-100%); width: 40%; }
-    50% { width: 60%; }
-    100% { transform: translateX(350%); width: 40%; }
+    0% {
+      transform: translateX(-100%);
+      width: 40%;
+    }
+
+    50% {
+      width: 60%;
+    }
+
+    100% {
+      transform: translateX(350%);
+      width: 40%;
+    }
   }
+
   @keyframes resultCardIn {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 }
 
@@ -93,8 +165,13 @@
       radial-gradient(ellipse 50% 40% at 50% 50%, rgba(236, 72, 153, 0.02) 0%, transparent 50%);
     background-attachment: fixed;
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-display font-bold text-text-primary tracking-tight;
     line-height: 1.5;
     padding-top: 18px !important;
@@ -110,8 +187,9 @@
     -webkit-text-fill-color: theme('colors.text-primary') !important;
     transition: background-color 5000s ease-in-out 0s;
   }
-  
-  select, option {
+
+  select,
+  option {
     background-color: var(--color-bg-card-solid);
     color: var(--color-text-primary);
   }
@@ -122,6 +200,7 @@
     -webkit-appearance: none;
     margin: 0;
   }
+
   input[type=number] {
     -moz-appearance: textfield;
   }
@@ -129,10 +208,13 @@
 
 @layer utilities {
   .glow-card {
-    @apply bg-bg-card backdrop-blur-md border border-border-default rounded-md shadow-[0_4px_16px_rgba(0,0,0,0.45)] relative transition-all duration-300 ease-out;
+    @apply bg-bg-card backdrop-blur-md border border-border-default rounded-md relative transition-all duration-300 ease-out;
+    box-shadow: var(--shadow-md);
   }
+
   .glow-card:hover {
-    @apply border-border-glow shadow-[0_4px_16px_rgba(0,0,0,0.45),_0_0_20px_rgba(0,240,255,0.12),_0_0_60px_rgba(0,240,255,0.05)];
+    @apply border-border-glow;
+    box-shadow: var(--shadow-md), var(--shadow-glow-cyan);
   }
 
   .label-upper {
@@ -147,8 +229,10 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 * {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* ── Legacy CSS variable aliases ──
@@ -245,16 +329,23 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-button, .clickable {
+button,
+.clickable {
   cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-button:active, .clickable:active {
+button:active,
+.clickable:active {
   transform: scale(0.97);
 }
 
@@ -267,7 +358,7 @@ button:active, .clickable:active {
   padding: 10px 20px !important;
 }
 
-/* From Uiverse.io by mrhyddenn */ 
+/* From Uiverse.io by mrhyddenn */
 button:not(nav button) {
   position: relative;
   padding: 10px 20px;
@@ -343,11 +434,25 @@ button:not(nav button):active {
   transform: scale(0.97);
 }
 
-.text-success { color: var(--text-success); }
-.text-danger { color: var(--text-danger); }
-.text-warning { color: var(--text-warning); }
-.text-accent { color: var(--text-cyan); }
-.text-purple { color: var(--text-purple); }
+.text-success {
+  color: var(--text-success);
+}
+
+.text-danger {
+  color: var(--text-danger);
+}
+
+.text-warning {
+  color: var(--text-warning);
+}
+
+.text-accent {
+  color: var(--text-cyan);
+}
+
+.text-purple {
+  color: var(--text-purple);
+}
 
 .shimmer-loader {
   background: linear-gradient(90deg, var(--bg-card-solid) 25%, #1a2040 50%, var(--bg-card-solid) 75%);
