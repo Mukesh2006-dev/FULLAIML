@@ -11,3 +11,5 @@ class TrainModelRequest(BaseModel):
     test_size: Optional[float] = 0.2
     random_state: Optional[int] = 42
     hyperparameters: Optional[Dict[str, Any]] = {}
+
+   
