@@ -10,9 +10,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import (
     accuracy_score,
+    precision_score,
+    recall_score,
     f1_score,
+    confusion_matrix,
+    mean_absolute_error,
     mean_squared_error,
-    r2_score
+    r2_score,
 )
 
 from sklearn.linear_model import LogisticRegression, LinearRegression
@@ -92,6 +96,52 @@ def prepare_dataset(df: pd.DataFrame, target_column: str):
     return X, y, label_encoder
 
 
+def evaluate_classification_model(y_test, y_pred):
+    labels = sorted(list(set(y_test) | set(y_pred)))
+    cm = confusion_matrix(y_test, y_pred, labels=labels)
+
+    heatmap_data = []
+
+    for i, actual_label in enumerate(labels):
+        for j, predicted_label in enumerate(labels):
+            heatmap_data.append({
+                "actual": str(actual_label),
+                "predicted": str(predicted_label),
+                "value": int(cm[i][j])
+            })
+
+    return {
+        "accuracy": round(float(accuracy_score(y_test, y_pred)), 4),
+        "precision": round(float(precision_score(y_test, y_pred, average="weighted", zero_division=0)), 4),
+        "recall": round(float(recall_score(y_test, y_pred, average="weighted", zero_division=0)), 4),
+        "f1_score": round(float(f1_score(y_test, y_pred, average="weighted", zero_division=0)), 4),
+        "confusion_matrix": {
+            "labels": [str(label) for label in labels],
+            "matrix": cm.tolist(),
+            "heatmap_data": heatmap_data
+        }
+    }
+
+
+def evaluate_regression_model(y_test, y_pred):
+    mse = mean_squared_error(y_test, y_pred)
+
+    return {
+        "mae": round(float(mean_absolute_error(y_test, y_pred)), 4),
+        "mse": round(float(mse), 4),
+        "rmse": round(float(mse ** 0.5), 4),
+        "r2_score": round(float(r2_score(y_test, y_pred)), 4),
+        "prediction_quality": {
+            "actual_vs_predicted": [
+                {
+                    "actual": float(actual),
+                    "predicted": float(predicted)
+                }
+                for actual, predicted in list(zip(y_test, y_pred))[:100]
+            ]
+        }
+    }
+
 def train_model_service(request: TrainModelRequest, user_id: int, db: Session):
     dataset = get_dataset_or_404(
         dataset_id=request.dataset_id,
@@ -123,16 +173,10 @@ def train_model_service(request: TrainModelRequest, user_id: int, db: Session):
     y_pred = model.predict(X_test)
 
     if request.problem_type == "classification":
-        metrics = {
-            "accuracy": round(float(accuracy_score(y_test, y_pred)), 4),
-            "f1_score": round(float(f1_score(y_test, y_pred, average="weighted")), 4)
-        }
+       metrics = evaluate_classification_model(y_test, y_pred)
 
     elif request.problem_type == "regression":
-        metrics = {
-            "rmse": round(float(mean_squared_error(y_test, y_pred) ** 0.5), 4),
-            "r2_score": round(float(r2_score(y_test, y_pred)), 4)
-        }
+       metrics = evaluate_regression_model(y_test, y_pred)
 
     else:
         raise HTTPException(status_code=400, detail="Invalid problem type")
