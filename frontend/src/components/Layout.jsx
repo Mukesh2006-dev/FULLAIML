@@ -1,10 +1,11 @@
 import Navbar from "./Navbar";
 import Silk from "./Silk";
 import { useLocation } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { LazyMotion, domAnimation, m, AnimatePresence, useReducedMotion } from "framer-motion";
 
 const Layout = ({ children }) => {
   const location = useLocation();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <>
@@ -28,15 +29,17 @@ const Layout = ({ children }) => {
 
         <main className="flex-1 p-4 md:p-8 z-10 relative max-w-[1400px] w-full mx-auto">
           <AnimatePresence mode="wait">
-            <motion.div
-              key={location.pathname}
-              initial={{ opacity: 0, y: 15, scale: 0.99 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="w-full h-full"
-            >
-              {children}
-            </motion.div>
+            <LazyMotion features={domAnimation} strict>
+              <m.div
+                key={location.pathname}
+                initial={{ opacity: 0, y: shouldReduceMotion ? 0 : 15, scale: shouldReduceMotion ? 1 : 0.99 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: shouldReduceMotion ? 0 : 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="w-full h-full"
+              >
+                {children}
+              </m.div>
+            </LazyMotion>
           </AnimatePresence>
         </main>
       </div>

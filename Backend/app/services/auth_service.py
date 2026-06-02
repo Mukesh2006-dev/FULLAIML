@@ -27,6 +27,7 @@ def register_user_service(user_data: UserCreate, db: Session):
         username=user_data.username,
         email=user_data.email.lower(),
         age=user_data.age,
+        role=user_data.role,
         hashed_password=hash_password(user_data.password)
     )
 
@@ -51,7 +52,8 @@ def login_user_service(user_data: UserLogin, db: Session):
 
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "is_profile_incomplete": user.age == 0 or user.role == "user" or user.age is None
     }
 
 
@@ -86,7 +88,9 @@ def google_login_service(token: str, db: Session):
         access_token = create_access_token(data={"sub": str(existing_user.id)})
         return {
             "access_token": access_token,
-            "token_type": "bearer"
+            "token_type": "bearer",
+            "is_new_user": False,
+            "is_profile_incomplete": existing_user.age == 0 or existing_user.role == "user" or existing_user.age is None
         }
 
     username = name or email.split("@")[0]
@@ -101,7 +105,7 @@ def google_login_service(token: str, db: Session):
     new_user = User(
     username=username,
     email=email,
-    age=None,
+    age=0,
     hashed_password=hash_password(random_password)
     )
 
@@ -113,5 +117,17 @@ def google_login_service(token: str, db: Session):
 
     return {
         "access_token": access_token,
-        "token_type": "bearer"
+        "token_type": "bearer",
+        "is_new_user": True,
+        "is_profile_incomplete": True
     }
+
+def update_user_profile(db: Session, current_user: User, update_data: dict):
+    if "age" in update_data and update_data["age"] is not None:
+        current_user.age = update_data["age"]
+    if "role" in update_data and update_data["role"] is not None:
+        current_user.role = update_data["role"]
+    
+    db.commit()
+    db.refresh(current_user)
+    return current_user

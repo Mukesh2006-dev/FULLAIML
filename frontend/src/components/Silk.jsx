@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef, useLayoutEffect } from 'react';
+import { useMemo, useRef, useLayoutEffect } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Color } from 'three';
 
@@ -67,7 +67,7 @@ void main() {
 }
 `;
 
-const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
+const SilkPlane = ({ uniforms, ref }) => {
   const { viewport } = useThree();
 
   useLayoutEffect(() => {
@@ -89,7 +89,7 @@ const SilkPlane = forwardRef(function SilkPlane({ uniforms }, ref) {
       <shaderMaterial uniforms={uniforms} vertexShader={vertexShader} fragmentShader={fragmentShader} />
     </mesh>
   );
-});
+};
 SilkPlane.displayName = 'SilkPlane';
 
 const Silk = ({ speed = 5, scale = 1, color = '#7B7481', noiseIntensity = 1.5, rotation = 0 }) => {

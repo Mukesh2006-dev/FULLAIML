@@ -12,6 +12,7 @@ const Preprocessing = lazy(() => import("./pages/Preprocessing"));
 const Eda = lazy(() => import("./pages/EDA"));
 const Visualizations = lazy(() => import("./pages/Visualizations"));
 const ModelTraining = lazy(() => import("./pages/ModelTraining"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -45,7 +46,7 @@ const SkeletonLoader = () => (
 // Global loader for initial page load (Login/Register)
 const GlobalLoader = () => (
   <div className="flex h-screen w-screen items-center justify-center bg-bg-root">
-    <div className="w-12 h-12 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin"></div>
+    <div className="size-12 rounded-full border-4 border-cyan-500/30 border-t-cyan-500 animate-spin"></div>
   </div>
 );
 
@@ -64,6 +65,7 @@ function App() {
               <Route path="/eda" element={<Eda />} />
               <Route path="/visualizations" element={<Visualizations />} />
               <Route path="/ml-model" element={<ModelTraining />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
 
             {/* Fallback route */}

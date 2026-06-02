@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Upload,
@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   // Delete modal state
   const [deleteModal, setDeleteModal] = useState({
@@ -33,23 +34,41 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-  const fetchDatasets = async () => {
+  const fetchDatasets = useCallback(async () => {
     try {
       setLoading(true);
       const response = await API.get("/datasets/");
       setDatasets(response.data);
     } catch (error) {
-        console.error(error);
+      console.error(error);
       setError("Failed to load datasets. Please check the backend connection.");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
+    const fetchUser = async () => {
+      if (sessionStorage.getItem("profile_toast_shown")) return;
+      try {
+        const response = await API.get("/auth/me");
+        const user = response.data;
+        if (user.age === 0 || user.role === "user" || !user.age) {
+          setProfileIncomplete(true);
+          sessionStorage.setItem("profile_toast_shown", "true");
+          setTimeout(() => {
+            setProfileIncomplete(false);
+          }, 5000);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchUser();
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchDatasets();
-  }, []);
+  }, [fetchDatasets]);
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -173,6 +192,37 @@ const Dashboard = () => {
         <h1>Dataset Hub</h1>
         <p>Upload, explore, clean, and build machine learning models with your data</p>
       </div>
+
+      {profileIncomplete && (
+        <div className="profile-toast">
+          <div className="profile-toast-glow" />
+          <div className="profile-toast-content">
+            <div className="profile-toast-icon">
+              <AlertCircle size={24} />
+            </div>
+            <div className="profile-toast-text">
+              <span className="profile-toast-title">Profile Incomplete</span>
+              <span className="profile-toast-desc">Add your age & role to unlock all features</span>
+            </div>
+            <button
+              type="button"
+              className="profile-toast-btn clickable"
+              onClick={() => navigate('/profile')}
+            >
+              Complete Profile
+            </button>
+            <button
+              type="button"
+              className="profile-toast-close clickable"
+              onClick={() => setProfileIncomplete(false)}
+              aria-label="Dismiss"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="profile-toast-progress" />
+        </div>
+      )}
 
       {error && (
         <div className="dashboard-alert error-bg">

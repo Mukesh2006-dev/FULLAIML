@@ -8,6 +8,7 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
     age: int
+    role: Optional[str] = "user"
 
     @field_validator("password")
     @classmethod
@@ -60,3 +61,5 @@ class UserResponse(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    is_new_user: Optional[bool] = False
+    is_profile_incomplete: Optional[bool] = False
