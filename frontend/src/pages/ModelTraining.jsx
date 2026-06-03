@@ -14,11 +14,13 @@ import {
 } from "lucide-react";
 import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
+import { useToast } from "../components/ToastContext";
 import "./ModelTraining.css";
 
 const ModelTraining = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const queryDatasetId = searchParams.get("dataset_id");
 
   const [datasets, setDatasets] = useState([]);
@@ -131,6 +133,11 @@ const ModelTraining = () => {
       });
 
       setTrainResult(response.data);
+      addToast(
+        "Model Training Complete",
+        `Model "${modelName}" has been trained and validated successfully.`,
+        "success"
+      );
     } catch (err) {
       setError(
         err.response?.data?.detail || "Training failed. Check columns compatibility (avoid string columns as targets without cleaning)."

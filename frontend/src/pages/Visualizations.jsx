@@ -9,6 +9,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import API from "../utils/api";
+import { useToast } from "../components/ToastContext";
 import "./Visualizations.css";
 
 const ReactECharts = lazy(() => import("echarts-for-react"));
@@ -367,6 +368,7 @@ const ChartRenderer = ({ chartResult }) => {
 const Visualizations = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const queryDatasetId = searchParams.get("dataset_id");
 
   const [datasets, setDatasets] = useState([]);
@@ -468,6 +470,11 @@ const Visualizations = () => {
       }
 
       setChartResult(response.data);
+      addToast(
+        "Visualization Rendered",
+        "Your data graphics have been compiled successfully.",
+        "success"
+      );
     } catch (err) {
       setError(
         err.response?.data?.detail || "Failed to generate visualization. Verify input columns datatype compatibility."
