@@ -128,7 +128,9 @@
   border-radius: var(--radius-sm);
   transition: all var(--transition-fast);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
+  justify-content: center;
+  align-self: flex-start;
 }
 
 .toast-close:hover {
