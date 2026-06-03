@@ -219,3 +219,166 @@ def train_model_service(request: TrainModelRequest, user_id: int, db: Session):
         "metrics": metrics,
         "model_path": model_path
     }
+
+def compare_classification_models_service(dataset_id: int, user_id: int, db: Session):
+    trained_models = db.query(MLModel).filter(
+        MLModel.dataset_id == dataset_id,
+        MLModel.user_id == user_id,
+        MLModel.problem_type == "classification"
+    ).all()
+
+    if len(trained_models) == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="No classification models found"
+        )
+
+    unique_models = {}
+
+    for model in trained_models:
+        key = (
+            model.algorithm,
+            model.target_column,
+            model.model_name
+        )
+
+        if key not in unique_models:
+            unique_models[key] = model
+        else:
+            if model.id > unique_models[key].id:
+                unique_models[key] = model
+
+    models = list(unique_models.values())
+
+    if len(models) == 1:
+        model = models[0]
+        metrics = model.metrics or {}
+
+        return {
+            "message": "Only one unique classification model found. Train another different model to compare.",
+            "total_trained_models": len(trained_models),
+            "unique_models_count": 1,
+            "model": {
+                "model_id": model.id,
+                "model_name": model.model_name,
+                "algorithm": model.algorithm,
+                "accuracy": metrics.get("accuracy"),
+                "precision": metrics.get("precision"),
+                "recall": metrics.get("recall"),
+                "f1_score": metrics.get("f1_score"),
+            }
+        }
+
+    comparison = []
+
+    for model in models:
+        metrics = model.metrics or {}
+
+        comparison.append({
+            "model_id": model.id,
+            "model_name": model.model_name,
+            "algorithm": model.algorithm,
+            "accuracy": metrics.get("accuracy"),
+            "precision": metrics.get("precision"),
+            "recall": metrics.get("recall"),
+            "f1_score": metrics.get("f1_score"),
+        })
+
+    best_model = max(
+        comparison,
+        key=lambda x: (
+            x.get("f1_score") or 0,
+            x.get("accuracy") or 0
+        )
+    )
+
+    return {
+        "message": "Classification model comparison generated successfully",
+        "dataset_id": dataset_id,
+        "total_trained_models": len(trained_models),
+        "unique_models_count": len(comparison),
+        "best_model": best_model,
+        "comparison": comparison
+    }
+
+
+def compare_regression_models_service(dataset_id: int, user_id: int, db: Session):
+    trained_models = db.query(MLModel).filter(
+        MLModel.dataset_id == dataset_id,
+        MLModel.user_id == user_id,
+        MLModel.problem_type == "regression"
+    ).all()
+
+    if len(trained_models) == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="No regression models found"
+        )
+
+    unique_models = {}
+
+    for model in trained_models:
+        key = (
+            model.algorithm,
+            model.target_column,
+            model.model_name
+        )
+
+        if key not in unique_models:
+            unique_models[key] = model
+        else:
+            if model.id > unique_models[key].id:
+                unique_models[key] = model
+
+    models = list(unique_models.values())
+
+    if len(models) == 1:
+        model = models[0]
+        metrics = model.metrics or {}
+
+        return {
+            "message": "Only one unique regression model found. Train another different model to compare.",
+            "total_trained_models": len(trained_models),
+            "unique_models_count": 1,
+            "model": {
+                "model_id": model.id,
+                "model_name": model.model_name,
+                "algorithm": model.algorithm,
+                "mae": metrics.get("mae"),
+                "mse": metrics.get("mse"),
+                "rmse": metrics.get("rmse"),
+                "r2_score": metrics.get("r2_score"),
+            }
+        }
+
+    comparison = []
+
+    for model in models:
+        metrics = model.metrics or {}
+
+        comparison.append({
+            "model_id": model.id,
+            "model_name": model.model_name,
+            "algorithm": model.algorithm,
+            "mae": metrics.get("mae"),
+            "mse": metrics.get("mse"),
+            "rmse": metrics.get("rmse"),
+            "r2_score": metrics.get("r2_score"),
+        })
+
+    best_model = max(
+        comparison,
+        key=lambda x: (
+            x.get("r2_score") or -999999,
+            -(x.get("rmse") or 999999)
+        )
+    )
+
+    return {
+        "message": "Regression model comparison generated successfully",
+        "dataset_id": dataset_id,
+        "total_trained_models": len(trained_models),
+        "unique_models_count": len(comparison),
+        "best_model": best_model,
+        "comparison": comparison
+    }
