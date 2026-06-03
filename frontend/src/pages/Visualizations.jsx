@@ -8,6 +8,7 @@ import {
   SlidersHorizontal,
   TrendingUp
 } from "lucide-react";
+import { motion } from "framer-motion";
 import API from "../utils/api";
 import { useToast } from "../components/ToastContext";
 import "./Visualizations.css";
@@ -766,7 +767,12 @@ const Visualizations = () => {
             </div>
           ) : (
             <div className="idle-display">
-              <Image size={56} className="idle-img-icon" />
+              <motion.div
+                animate={{ scale: [1, 1.05, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Image size={56} className="idle-img-icon" />
+              </motion.div>
               <h3>No Active Chart</h3>
               <p>Configure your visualization and click "Render" on the left panel to output charts.</p>
             </div>

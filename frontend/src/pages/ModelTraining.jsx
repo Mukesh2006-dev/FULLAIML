@@ -10,8 +10,10 @@ import {
   Activity,
   Award,
   BarChart3,
-  ScatterChart
+  ScatterChart,
+  Scale
 } from "lucide-react";
+import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
 import { useToast } from "../components/ToastContext";
@@ -578,11 +580,27 @@ const ModelTraining = () => {
                     </strong>
                   </div>
                 </div>
+
+                <div style={{ marginTop: '1.5rem' }}>
+                  <button 
+                    className="generate-btn clickable" 
+                    style={{ width: '100%', background: 'var(--bg-inset)', border: '1px solid var(--border-focus)' }}
+                    onClick={() => navigate(`/ml-comparison?dataset_id=${selectedDatasetId}&problem_type=${problemType}`)}
+                  >
+                    <Scale size={18} />
+                    Compare with Previous Models
+                  </button>
+                </div>
               </div>
             </div>
           ) : (
             <div className="training-idle-state">
-              <BrainCircuit size={56} className="idle-brain-icon" />
+              <motion.div
+                animate={{ scale: [1, 1.05, 1], opacity: [0.5, 1, 0.5] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <BrainCircuit size={56} className="idle-brain-icon" />
+              </motion.div>
               <h3>Training Ready</h3>
               <p>Configure model target and algorithm parameters on the left card and click "Start" to launch the training process.</p>
             </div>

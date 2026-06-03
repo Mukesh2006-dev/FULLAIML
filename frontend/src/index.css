@@ -16,7 +16,7 @@
 
   --color-text-primary: #e8ecf4;
   --color-text-secondary: #8892a8;
-  --color-text-muted: #5a6378;
+  --color-text-muted: #8f9bb3;
   --color-text-cyan: #00f0ff;
   --color-text-purple: #a78bfa;
   --color-text-warning: #fbbf24;
@@ -213,8 +213,8 @@
   }
 
   .glow-card:hover {
-    @apply border-border-glow;
-    box-shadow: var(--shadow-md), var(--shadow-glow-cyan);
+    @apply border-border-focus;
+    box-shadow: var(--shadow-md);
   }
 
   .label-upper {
@@ -316,8 +316,8 @@
 }
 
 .glass-panel:hover {
-  border-color: var(--border-glow);
-  box-shadow: var(--shadow-md), var(--shadow-glow-cyan);
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-md);
 }
 
 .page-enter {

@@ -12,6 +12,7 @@ const Preprocessing = lazy(() => import("./pages/Preprocessing"));
 const Eda = lazy(() => import("./pages/EDA"));
 const Visualizations = lazy(() => import("./pages/Visualizations"));
 const ModelTraining = lazy(() => import("./pages/ModelTraining"));
+const ModelComparison = lazy(() => import("./pages/ModelComparison"));
 const Profile = lazy(() => import("./pages/Profile"));
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
@@ -65,6 +66,7 @@ function App() {
               <Route path="/eda" element={<Eda />} />
               <Route path="/visualizations" element={<Visualizations />} />
               <Route path="/ml-model" element={<ModelTraining />} />
+              <Route path="/ml-comparison" element={<ModelComparison />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
 
