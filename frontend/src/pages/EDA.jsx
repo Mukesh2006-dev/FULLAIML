@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-
   FileSpreadsheet,
   Grid,
   TrendingUp,
@@ -11,6 +10,7 @@ import {
   TableProperties
 } from "lucide-react";
 import API from "../utils/api";
+import { safeApiCall } from "../utils/asyncHandler";
 import "./EDA.css";
 
 const Eda = () => {
@@ -35,19 +35,18 @@ const Eda = () => {
 
   useEffect(() => {
     const fetchDatasets = async () => {
-      try {
-        setLoadingDatasets(true);
-        const response = await API.get("/datasets/");
+      setLoadingDatasets(true);
+      const [response, error] = await safeApiCall(API.get("/datasets/"));
+      if (error) {
+        console.error(error);
+        setError("Failed to fetch datasets list.");
+      } else if (response) {
         setDatasets(response.data);
         if (response.data.length > 0) {
           setSelectedDatasetId(prev => prev || response.data[0].id.toString());
         }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch datasets list.");
-      } finally {
-        setLoadingDatasets(false);
       }
+      setLoadingDatasets(false);
     };
      
     fetchDatasets();
@@ -60,29 +59,29 @@ const Eda = () => {
       setError("");
       setLoadingAnalysis(true);
       
-      try {
-        const [sumRes, insRes, distRes] = await Promise.all([
-          API.get(`/analysis/${selectedDatasetId}/summary`),
-          API.get(`/analysis/${selectedDatasetId}/insights`),
-          API.get(`/analysis/${selectedDatasetId}/distribution`),
-        ]);
+      const [results, err] = await safeApiCall(Promise.all([
+        API.get(`/analysis/${selectedDatasetId}/summary`),
+        API.get(`/analysis/${selectedDatasetId}/insights`),
+        API.get(`/analysis/${selectedDatasetId}/distribution`),
+      ]));
 
+      if (err) {
+        setError(err.response?.data?.detail || "Failed to retrieve analysis data.");
+      } else if (results) {
+        const [sumRes, insRes, distRes] = results;
         setSummaryData(sumRes.data);
         setInsightsData(insRes.data);
         setDistributionData(distRes.data);
 
         // Correlation might fail if there are no numeric columns
-        try {
-          const corrRes = await API.get(`/analysis/${selectedDatasetId}/correlation`);
-          setCorrelationData(corrRes.data);
-        } catch {
+        const [corrRes, corrErr] = await safeApiCall(API.get(`/analysis/${selectedDatasetId}/correlation`));
+        if (corrErr) {
           setCorrelationData(null); // Set null if no numeric columns
+        } else if (corrRes) {
+          setCorrelationData(corrRes.data);
         }
-      } catch (err) {
-        setError(err.response?.data?.detail || "Failed to retrieve analysis data.");
-      } finally {
-        setLoadingAnalysis(false);
       }
+      setLoadingAnalysis(false);
     };
 
     runEDA();

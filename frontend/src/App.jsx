@@ -1,19 +1,20 @@
-import { lazy, Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Layout from "./components/Layout";
+import { lazyWithPreload } from "./utils/lazyWithPreload";
 import "./App.css";
 
 // Lazy load the pages for code splitting
-const Login = lazy(() => import("./pages/Login"));
-const Register = lazy(() => import("./pages/Register"));
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Preprocessing = lazy(() => import("./pages/Preprocessing"));
-const Eda = lazy(() => import("./pages/EDA"));
-const Visualizations = lazy(() => import("./pages/Visualizations"));
-const ModelTraining = lazy(() => import("./pages/ModelTraining"));
-const ModelComparison = lazy(() => import("./pages/ModelComparison"));
-const Profile = lazy(() => import("./pages/Profile"));
+const Login = lazyWithPreload(() => import("./pages/Login"));
+const Register = lazyWithPreload(() => import("./pages/Register"));
+const Dashboard = lazyWithPreload(() => import("./pages/Dashboard"));
+const Preprocessing = lazyWithPreload(() => import("./pages/Preprocessing"));
+const Eda = lazyWithPreload(() => import("./pages/EDA"));
+const Visualizations = lazyWithPreload(() => import("./pages/Visualizations"));
+const ModelTraining = lazyWithPreload(() => import("./pages/ModelTraining"));
+const ModelComparison = lazyWithPreload(() => import("./pages/ModelComparison"));
+const Profile = lazyWithPreload(() => import("./pages/Profile"));
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -52,6 +53,11 @@ const GlobalLoader = () => (
 );
 
 function App() {
+  useEffect(() => {
+    // Preload critical routes after initial render
+    Dashboard.preload();
+  }, []);
+
   return (
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <Router>

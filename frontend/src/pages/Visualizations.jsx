@@ -11,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import API from "../utils/api";
 import { useToast } from "../components/ToastContext";
+import { safeApiCall } from "../utils/asyncHandler";
 import "./Visualizations.css";
 
 const ReactECharts = lazy(() => import("echarts-for-react"));
@@ -391,19 +392,18 @@ const Visualizations = () => {
 
   useEffect(() => {
     const fetchDatasets = async () => {
-      try {
-        setLoadingDatasets(true);
-        const response = await API.get("/datasets/");
+      setLoadingDatasets(true);
+      const [response, error] = await safeApiCall(API.get("/datasets/"));
+      if (error) {
+        console.error(error);
+        setError("Failed to fetch datasets list.");
+      } else if (response) {
         setDatasets(response.data);
         if (response.data.length > 0) {
           setSelectedDatasetId(prev => prev || response.data[0].id.toString());
         }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch datasets list.");
-      } finally {
-        setLoadingDatasets(false);
       }
+      setLoadingDatasets(false);
     };
 
     fetchDatasets();
@@ -417,20 +417,19 @@ const Visualizations = () => {
       setLoadingColumns(true);
       setChartResult(null);
 
-      try {
-        const response = await API.get(`/analysis/${selectedDatasetId}/summary`);
+      const [response, error] = await safeApiCall(API.get(`/analysis/${selectedDatasetId}/summary`));
+      if (error) {
+        console.error(error);
+        setError("Failed to fetch columns metadata for dataset.");
+      } else if (response) {
         setColumns(response.data.column_names || []);
         if (response.data.column_names?.length > 0) {
           setColumn(response.data.column_names[0]);
           setXColumn(response.data.column_names[0]);
           setYColumn(response.data.column_names[1] || response.data.column_names[0]);
         }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch columns metadata for dataset.");
-      } finally {
-        setLoadingColumns(false);
       }
+      setLoadingColumns(false);
     };
 
     fetchColumns();
@@ -448,41 +447,46 @@ const Visualizations = () => {
     setLoadingChart(true);
     setChartResult(null);
 
-    try {
-      let response;
-      if (plotType === "histogram") {
-        response = await API.get(`/visualizations/${selectedDatasetId}/histogram`, {
-          params: { column }
-        });
-      } else if (plotType === "bar") {
-        response = await API.get(`/visualizations/${selectedDatasetId}/bar`, {
-          params: { column }
-        });
-      } else if (plotType === "scatter") {
-        response = await API.get(`/visualizations/${selectedDatasetId}/scatter`, {
-          params: { x_column: xColumn, y_column: yColumn }
-        });
-      } else if (plotType === "heatmap") {
-        response = await API.get(`/visualizations/${selectedDatasetId}/heatmap`);
-      } else if (plotType === "boxplot") {
-        response = await API.get(`/visualizations/${selectedDatasetId}/boxplot`, {
-          params: { column }
-        });
-      }
+    let requestPromise;
+    if (plotType === "histogram") {
+      requestPromise = API.get(`/visualizations/${selectedDatasetId}/histogram`, {
+        params: { column }
+      });
+    } else if (plotType === "bar") {
+      requestPromise = API.get(`/visualizations/${selectedDatasetId}/bar`, {
+        params: { column }
+      });
+    } else if (plotType === "scatter") {
+      requestPromise = API.get(`/visualizations/${selectedDatasetId}/scatter`, {
+        params: { x_column: xColumn, y_column: yColumn }
+      });
+    } else if (plotType === "heatmap") {
+      requestPromise = API.get(`/visualizations/${selectedDatasetId}/heatmap`);
+    } else if (plotType === "boxplot") {
+      requestPromise = API.get(`/visualizations/${selectedDatasetId}/boxplot`, {
+        params: { column }
+      });
+    }
 
+    if (!requestPromise) {
+      setLoadingChart(false);
+      return;
+    }
+
+    const [response, err] = await safeApiCall(requestPromise);
+    if (err) {
+      setError(
+        err.response?.data?.detail || "Failed to generate visualization. Verify input columns datatype compatibility."
+      );
+    } else if (response) {
       setChartResult(response.data);
       addToast(
         "Visualization Rendered",
         "Your data graphics have been compiled successfully.",
         "success"
       );
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || "Failed to generate visualization. Verify input columns datatype compatibility."
-      );
-    } finally {
-      setLoadingChart(false);
     }
+    setLoadingChart(false);
   };
 
   /* ─── Render functions ─── */

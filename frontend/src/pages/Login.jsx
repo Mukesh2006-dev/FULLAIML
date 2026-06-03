@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Database, Lock, Mail, ArrowRight } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import API from "../utils/api";
+import { safeApiCall } from "../utils/asyncHandler";
 import Silk from "../components/Silk";
 import "./Login.css";
 
@@ -30,16 +31,24 @@ const Login = () => {
     setSuccess("");
     setLoading(true);
 
-    try {
-      const formData = new URLSearchParams();
-      formData.append("username", email);
-      formData.append("password", password);
+    const formData = new URLSearchParams();
+    formData.append("username", email);
+    formData.append("password", password);
 
-      const response = await API.post("/auth/login", formData, {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      });
+    const [response, err] = await safeApiCall(API.post("/auth/login", formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }));
+
+    if (err) {
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map((d) => d.msg).join(". "));
+      } else {
+        setError(detail || "Invalid credentials. Please try again.");
+      }
+    } else if (response) {
       localStorage.setItem("token", response.data.access_token);
       if (response.data.is_profile_incomplete) {
         localStorage.setItem("profile_incomplete", "true");
@@ -50,16 +59,8 @@ const Login = () => {
       setTimeout(() => {
         navigate("/dashboard");
       }, 1500);
-    } catch (err) {
-      const detail = err.response?.data?.detail;
-      if (Array.isArray(detail)) {
-        setError(detail.map((d) => d.msg).join(". "));
-      } else {
-        setError(detail || "Invalid credentials. Please try again.");
-      }
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const googleLogin = useGoogleLogin({
@@ -67,10 +68,14 @@ const Login = () => {
       setGoogleLoading(true);
       setError("");
       setSuccess("");
-      try {
-        const res = await API.post("/auth/google-login", {
-          token: tokenResponse.access_token,
-        });
+      const [res, err] = await safeApiCall(API.post("/auth/google-login", {
+        token: tokenResponse.access_token,
+      }));
+      if (err) {
+        setError(
+          err.response?.data?.detail || "Google sign-in failed. Please try again."
+        );
+      } else if (res) {
         localStorage.setItem("token", res.data.access_token);
         if (res.data.is_profile_incomplete) {
           localStorage.setItem("profile_incomplete", "true");
@@ -81,13 +86,8 @@ const Login = () => {
         setTimeout(() => {
           navigate("/dashboard");
         }, 1500);
-      } catch (err) {
-        setError(
-          err.response?.data?.detail || "Google sign-in failed. Please try again."
-        );
-      } finally {
-        setGoogleLoading(false);
       }
+      setGoogleLoading(false);
     },
     onError: () => {
       setError("Google sign-in was cancelled or failed.");

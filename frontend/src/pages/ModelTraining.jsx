@@ -17,6 +17,7 @@ import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
 import { useToast } from "../components/ToastContext";
+import { safeApiCall } from "../utils/asyncHandler";
 import "./ModelTraining.css";
 
 const ModelTraining = () => {
@@ -50,19 +51,18 @@ const ModelTraining = () => {
 
   useEffect(() => {
     const fetchDatasets = async () => {
-      try {
-        setLoadingDatasets(true);
-        const response = await API.get("/datasets/");
+      setLoadingDatasets(true);
+      const [response, error] = await safeApiCall(API.get("/datasets/"));
+      if (error) {
+        console.error(error);
+        setError("Failed to fetch datasets list.");
+      } else if (response) {
         setDatasets(response.data);
         if (response.data.length > 0) {
           setSelectedDatasetId(prev => prev || response.data[0].id.toString());
         }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch datasets list.");
-      } finally {
-        setLoadingDatasets(false);
       }
+      setLoadingDatasets(false);
     };
      
     fetchDatasets();
@@ -76,18 +76,17 @@ const ModelTraining = () => {
       setLoadingColumns(true);
       setTrainResult(null);
 
-      try {
-        const response = await API.get(`/analysis/${selectedDatasetId}/summary`);
+      const [response, error] = await safeApiCall(API.get(`/analysis/${selectedDatasetId}/summary`));
+      if (error) {
+        console.error(error);
+        setError("Failed to fetch columns metadata.");
+      } else if (response) {
         setColumns(response.data.column_names || []);
         if (response.data.column_names?.length > 0) {
           setTargetColumn(response.data.column_names[response.data.column_names.length - 1]);
         }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch columns metadata.");
-      } finally {
-        setLoadingColumns(false);
       }
+      setLoadingColumns(false);
     };
 
     fetchColumns();
@@ -122,31 +121,30 @@ const ModelTraining = () => {
       }
     }
 
-    try {
-      const response = await API.post("/ml/train", {
-        dataset_id: parseInt(selectedDatasetId),
-        model_name: modelName,
-        algorithm,
-        problem_type: problemType,
-        target_column: targetColumn,
-        test_size: parseFloat(testSize),
-        random_state: parseInt(randomState),
-        hyperparameters,
-      });
+    const [response, err] = await safeApiCall(API.post("/ml/train", {
+      dataset_id: parseInt(selectedDatasetId),
+      model_name: modelName,
+      algorithm,
+      problem_type: problemType,
+      target_column: targetColumn,
+      test_size: parseFloat(testSize),
+      random_state: parseInt(randomState),
+      hyperparameters,
+    }));
 
+    if (err) {
+      setError(
+        err.response?.data?.detail || "Training failed. Check columns compatibility (avoid string columns as targets without cleaning)."
+      );
+    } else if (response) {
       setTrainResult(response.data);
       addToast(
         "Model Training Complete",
         `Model "${modelName}" has been trained and validated successfully.`,
         "success"
       );
-    } catch (err) {
-      setError(
-        err.response?.data?.detail || "Training failed. Check columns compatibility (avoid string columns as targets without cleaning)."
-      );
-    } finally {
-      setTraining(false);
     }
+    setTraining(false);
   };
 
   return (

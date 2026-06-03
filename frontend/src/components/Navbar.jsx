@@ -13,6 +13,7 @@ import {
   Scale
 } from "lucide-react";
 import API from "../utils/api";
+import { safeApiCall } from "../utils/asyncHandler";
 
 const NAV_ITEMS = [
   { path: "/dashboard", label: "Dashboard" },
@@ -33,11 +34,11 @@ const Navbar = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const res = await API.get("/auth/me");
-        setUserData(res.data);
-      } catch (err) {
+      const [res, err] = await safeApiCall(API.get("/auth/me"));
+      if (err) {
         console.error("Failed to fetch user data:", err);
+      } else if (res) {
+        setUserData(res.data);
       }
     };
     if (token) {

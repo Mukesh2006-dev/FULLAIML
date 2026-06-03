@@ -11,6 +11,7 @@ import {
 import { motion } from "framer-motion";
 import API from "../utils/api";
 import { useToast } from "../components/ToastContext";
+import { safeApiCall } from "../utils/asyncHandler";
 import "./ModelComparison.css";
 
 const ModelComparison = () => {
@@ -32,14 +33,14 @@ const ModelComparison = () => {
   // Fetch user's datasets
   useEffect(() => {
     const fetchDatasets = async () => {
-      try {
-        const res = await API.get("/datasets/");
+      const [res, err] = await safeApiCall(API.get("/datasets/"));
+      if (err) {
+        console.error("Failed to load datasets:", err);
+      } else if (res) {
         setDatasets(res.data);
         if (res.data.length > 0 && !queryDatasetId) {
           setDatasetId(res.data[0].id.toString());
         }
-      } catch (err) {
-        console.error("Failed to load datasets:", err);
       }
     };
     fetchDatasets();
@@ -56,24 +57,23 @@ const ModelComparison = () => {
     }
 
     setLoading(true);
-    try {
-      const response = await API.get(`/ml/compare/${problemType}`, {
-        params: { dataset_id: datasetId }
-      });
+    const [response, err] = await safeApiCall(API.get(`/ml/compare/${problemType}`, {
+      params: { dataset_id: datasetId }
+    }));
 
+    if (err) {
+      const detail = err.response?.data?.detail || "Failed to compare models.";
+      setError(detail);
+      addToast("Comparison Failed", detail, "error");
+    } else if (response) {
       setResult(response.data);
       addToast(
         "Comparison Complete",
         response.data.message || "Models compared successfully.",
         "success"
       );
-    } catch (err) {
-      const detail = err.response?.data?.detail || "Failed to compare models.";
-      setError(detail);
-      addToast("Comparison Failed", detail, "error");
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   };
 
   const getMetricKeys = () => {

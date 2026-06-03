@@ -12,6 +12,7 @@ import {
   Loader2
 } from "lucide-react";
 import API from "../utils/api";
+import { safeApiCall } from "../utils/asyncHandler";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
 import "./Dashboard.css";
 
@@ -35,38 +36,40 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const fetchDatasets = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await API.get("/datasets/");
-      setDatasets(response.data);
-    } catch (error) {
+    setLoading(true);
+    const [response, error] = await safeApiCall(API.get("/datasets/"));
+    if (error) {
       console.error(error);
       setError("Failed to load datasets. Please check the backend connection.");
-    } finally {
-      setLoading(false);
+    } else if (response) {
+      setDatasets(response.data);
     }
+    setLoading(false);
   }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
       if (sessionStorage.getItem("profile_toast_shown")) return;
-      try {
-        const response = await API.get("/auth/me");
-        const user = response.data;
-        if (user.age === 0 || user.role === "user" || !user.age) {
-          setProfileIncomplete(true);
-          sessionStorage.setItem("profile_toast_shown", "true");
-          setTimeout(() => {
-            setProfileIncomplete(false);
-          }, 5000);
-        }
-      } catch (err) {
+      const [response, err] = await safeApiCall(API.get("/auth/me"));
+      if (err) {
         console.error(err);
+        return;
+      }
+      
+      const user = response.data;
+      if (user.age === 0 || user.role === "user" || !user.age) {
+        setProfileIncomplete(true);
+        sessionStorage.setItem("profile_toast_shown", "true");
+        setTimeout(() => {
+          setProfileIncomplete(false);
+        }, 5000);
       }
     };
 
     fetchUser();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
+  }, []);
+
+  useEffect(() => {
     fetchDatasets();
   }, [fetchDatasets]);
 
@@ -103,24 +106,24 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    try {
-      await API.post("/datasets/upload", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
+    const [_, err] = await safeApiCall(API.post("/datasets/upload", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }));
+    
+    if (err) {
+      setError(err.response?.data?.detail || "Failed to upload file.");
+    } else {
       setSuccess("Dataset uploaded successfully!");
       setFile(null);
       // Reset input element
       const inputEl = document.getElementById("csv-file-input");
       if (inputEl) inputEl.value = "";
        
-    fetchDatasets();
-    } catch (err) {
-      setError(err.response?.data?.detail || "Failed to upload file.");
-    } finally {
-      setUploading(false);
+      fetchDatasets();
     }
+    setUploading(false);
   };
 
   // Open the delete confirmation modal
@@ -142,15 +145,9 @@ const Dashboard = () => {
 
     setDeleteModal((prev) => ({ ...prev, isDeleting: true }));
 
-    try {
-      const response = await API.delete(`/datasets/${datasetId}`);
-      setDeleteModal((prev) => ({
-        ...prev,
-        isDeleting: false,
-        deleteResult: response.data,
-      }));
-    } catch (error) {
-        console.error(error);
+    const [response, error] = await safeApiCall(API.delete(`/datasets/${datasetId}`));
+    if (error) {
+      console.error(error);
       setDeleteModal((prev) => ({
         ...prev,
         isOpen: false,
@@ -158,6 +155,12 @@ const Dashboard = () => {
         deleteResult: null,
       }));
       setError("Failed to delete dataset. Please try again.");
+    } else {
+      setDeleteModal((prev) => ({
+        ...prev,
+        isDeleting: false,
+        deleteResult: response.data,
+      }));
     }
   };
 

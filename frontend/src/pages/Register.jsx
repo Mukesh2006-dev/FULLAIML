@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { Database, Lock, Mail, User, ArrowRight, Check, X } from "lucide-react";
 import { useGoogleLogin } from "@react-oauth/google";
 import API from "../utils/api";
+import { safeApiCall } from "../utils/asyncHandler";
 import Silk from "../components/Silk";
 import "./Register.css";
 
@@ -60,10 +61,14 @@ const Register = () => {
       setGoogleLoading(true);
       setError("");
       setSuccess("");
-      try {
-        const res = await API.post("/auth/google-login", {
-          token: tokenResponse.access_token,
-        });
+      const [res, err] = await safeApiCall(API.post("/auth/google-login", {
+        token: tokenResponse.access_token,
+      }));
+      if (err) {
+        setError(
+          err.response?.data?.detail || "Google sign-up failed. Please try again."
+        );
+      } else if (res) {
         localStorage.setItem("token", res.data.access_token);
         
         const destination = res.data.is_profile_incomplete ? "/profile" : "/dashboard";
@@ -74,13 +79,8 @@ const Register = () => {
         setTimeout(() => {
           navigate(destination);
         }, 1500);
-      } catch (err) {
-        setError(
-          err.response?.data?.detail || "Google sign-up failed. Please try again."
-        );
-      } finally {
-        setGoogleLoading(false);
       }
+      setGoogleLoading(false);
     },
     onError: () => {
       setGoogleLoading(false);
@@ -115,20 +115,14 @@ const Register = () => {
 
     setLoading(true);
 
-    try {
-      await API.post("/auth/register", {
-        username,
-        email,
-        age: parseInt(age, 10),
-        role: role || "user",
-        password,
-      });
-
-      setSuccess("Registration successful! Redirecting to login…");
-      setTimeout(() => {
-        navigate("/login");
-      }, 2000);
-    } catch (err) {
+    const [_, err] = await safeApiCall(API.post("/auth/register", {
+      username,
+      email,
+      age: parseInt(age, 10),
+      role: role || "user",
+      password,
+    }));
+    if (err) {
       const detail = err.response?.data?.detail;
       if (Array.isArray(detail)) {
         // Parse Pydantic validation errors
@@ -141,9 +135,13 @@ const Register = () => {
       } else {
         setError(detail || "Registration failed. Try a different username/email.");
       }
-    } finally {
-      setLoading(false);
+    } else {
+      setSuccess("Registration successful! Redirecting to login…");
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
     }
+    setLoading(false);
   };
 
   return (

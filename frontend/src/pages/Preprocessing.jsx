@@ -11,6 +11,7 @@ import {
   Info
 } from "lucide-react";
 import API from "../utils/api";
+import { safeApiCall } from "../utils/asyncHandler";
 import "./Preprocessing.css";
 
 const Preprocessing = () => {
@@ -27,19 +28,18 @@ const Preprocessing = () => {
 
   useEffect(() => {
     const fetchDatasets = async () => {
-      try {
-        setLoadingDatasets(true);
-        const response = await API.get("/datasets/");
+      setLoadingDatasets(true);
+      const [response, error] = await safeApiCall(API.get("/datasets/"));
+      if (error) {
+        console.error(error);
+        setError("Failed to fetch datasets list.");
+      } else if (response) {
         setDatasets(response.data);
         if (response.data.length > 0) {
           setSelectedDatasetId(prev => prev || response.data[0].id.toString());
         }
-      } catch (error) {
-        console.error(error);
-        setError("Failed to fetch datasets list.");
-      } finally {
-        setLoadingDatasets(false);
       }
+      setLoadingDatasets(false);
     };
      
     fetchDatasets();
@@ -61,17 +61,16 @@ const Preprocessing = () => {
     setResult(null);
     setProcessing(true);
 
-    try {
-      const response = await API.post(`/preprocessing/${selectedDatasetId}/${endpoint}`);
+    const [response, err] = await safeApiCall(API.post(`/preprocessing/${selectedDatasetId}/${endpoint}`));
+    if (err) {
+      setError(err.response?.data?.detail || "An error occurred during cleaning.");
+    } else if (response) {
       setResult({
         action: endpoint,
         ...response.data,
       });
-    } catch (err) {
-      setError(err.response?.data?.detail || "An error occurred during cleaning.");
-    } finally {
-      setProcessing(false);
     }
+    setProcessing(false);
   };
 
   const getCleanedPercentage = (original, cleaned) => {

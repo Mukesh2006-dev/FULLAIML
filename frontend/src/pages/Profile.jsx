@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { User, Mail, ArrowLeft, Loader2, Calendar, Edit2, Save, X } from "lucide-react";
 import API from "../utils/api";
+import { safeApiCall } from "../utils/asyncHandler";
 import "./Profile.css";
 
 const Profile = () => {
@@ -18,19 +19,18 @@ const Profile = () => {
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const res = await API.get("/auth/me");
+      const [res, err] = await safeApiCall(API.get("/auth/me"));
+      if (err) {
+        console.error("Profile fetch error:", err);
+        setError("Failed to fetch user profile. Please try logging in again.");
+      } else if (res) {
         setUserData(res.data);
         setEditForm({
           age: res.data.age || "",
           role: res.data.role || "user"
         });
-      } catch (err) {
-        console.error(err);
-        setError("Failed to fetch user profile. Please try logging in again.");
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
     fetchUser();
   }, []);
@@ -65,21 +65,20 @@ const Profile = () => {
       return;
     }
 
-    try {
-      const payload = {
-        age: parsedAge,
-        role: editForm.role
-      };
-      const res = await API.put("/auth/me", payload);
+    const payload = {
+      age: parsedAge,
+      role: editForm.role
+    };
+    const [res, err] = await safeApiCall(API.put("/auth/me", payload));
+    if (err) {
+      console.error("Profile update error:", err);
+      setError("Failed to update profile.");
+    } else if (res) {
       setUserData(res.data);
       setIsEditing(false);
       setSuccessMsg("Profile updated successfully!");
-    } catch (err) {
-      console.error(err);
-      setError("Failed to update profile.");
-    } finally {
-      setSaving(false);
     }
+    setSaving(false);
   };
 
   return (
