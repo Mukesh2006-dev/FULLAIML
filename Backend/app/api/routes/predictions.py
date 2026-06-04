@@ -11,16 +11,30 @@ from Backend.app.schemas.predictions import (
     PredictionResponse,
     BatchPredictionResponse,
     PredictionHistoryResponse,
+    PredictionInputSchemaResponse
 )
 from Backend.app.services.prediction_service import (
     single_prediction_service,
     batch_prediction_service,
     prediction_history_service,
     model_prediction_history_service,
+    prediction_input_schema_service
 )
 
 router = APIRouter(prefix="/predictions", tags=["Predictions"])
 
+
+@router.get("/{model_id}/input-schema")
+def get_prediction_input_schema(
+    model_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return prediction_input_schema_service(
+        model_id=model_id,
+        user_id=current_user.id,
+        db=db
+    )
 
 @router.post("/{model_id}/single", response_model=PredictionResponse)
 def single_prediction(
