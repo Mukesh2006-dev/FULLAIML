@@ -15,6 +15,7 @@ const Visualizations = lazyWithPreload(() => import("./pages/Visualizations"));
 const ModelTraining = lazyWithPreload(() => import("./pages/ModelTraining"));
 const ModelComparison = lazyWithPreload(() => import("./pages/ModelComparison"));
 const Profile = lazyWithPreload(() => import("./pages/Profile"));
+const Predictions = lazyWithPreload(() => import("./pages/Predictions"));
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 
@@ -73,6 +74,7 @@ function App() {
               <Route path="/visualizations" element={<Visualizations />} />
               <Route path="/ml-model" element={<ModelTraining />} />
               <Route path="/ml-comparison" element={<ModelComparison />} />
+              <Route path="/predictions" element={<Predictions />} />
               <Route path="/profile" element={<Profile />} />
             </Route>
 
