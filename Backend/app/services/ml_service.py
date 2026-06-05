@@ -186,14 +186,15 @@ def train_model_service(request: TrainModelRequest, user_id: int, db: Session):
 
     model_package = {
         "model": model,
-        "columns": X.columns.tolist(),
-        "label_encoder": label_encoder,
-        "target_column": request.target_column,
-        "problem_type": request.problem_type
+    "columns": X.columns.tolist(),
+    "original_columns": df.drop(columns=[request.target_column]).columns.tolist(),
+    "label_encoder": label_encoder,
+    "target_column": request.target_column,
+    "problem_type": request.problem_type
     }
 
     joblib.dump(model_package, model_path)
-
+    
     new_model = MLModel(
         user_id=user_id,
         dataset_id=request.dataset_id,

@@ -63,6 +63,29 @@ def get_confidence_scores(model, prepared_df):
     return [None for _ in range(len(prepared_df))]
 
 
+
+def prediction_input_schema_service(model_id: int, user_id: int, db: Session):
+    model_record = get_model_or_404(model_id, user_id, db)
+
+    model_package = load_model_package(model_record.model_path)
+
+    original_columns = model_package.get("original_columns")
+
+    if not original_columns:
+        raise HTTPException(
+            status_code=400,
+            detail="This model was trained before original input schema was saved. Please retrain the model and use the new model_id."
+        )
+
+    return {
+        "model_id": model_record.id,
+        "model_name": model_record.model_name,
+        "problem_type": model_record.problem_type,
+        "target_column": model_record.target_column,
+        "required_input_columns": original_columns,
+        "message": "Use these fields to build the prediction input form"
+    }
+
 def single_prediction_service(
     model_id: int,
     input_data: dict,
