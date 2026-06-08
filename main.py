@@ -20,6 +20,9 @@ from Backend.app.api.routes.ml import router as ml_router
 from Backend.app.api.routes.visualization import router as visual_router
 from Backend.app.api.routes.predictions import router as prediction_router
 from Backend.app.api.routes.jobs import router as jobs_router
+from Backend.app.api.routes.model_management import router as model_management_router
+
+
 
 app = FastAPI(
     title="ML Analysis Project",
@@ -53,7 +56,7 @@ app.include_router(ml_router)
 app.include_router(visual_router)
 app.include_router(prediction_router)
 app.include_router(jobs_router)
-
+app.include_router(model_management_router)
 
 @app.get("/")
 def home():
