@@ -22,6 +22,7 @@ const NAV_ITEMS = [
   { path: "/visualizations", label: "Visualizations" },
   { path: "/ml-model", label: "Model Training" },
   { path: "/ml-comparison", label: "Compare Models" },
+  { path: "/models", label: "Models" },
   { path: "/predictions", label: "Predictions" },
 ];
 
@@ -171,6 +172,7 @@ const Navbar = () => {
                   {index === 4 && <BrainCircuit size={18} />}
                   {index === 5 && <Scale size={18} />}
                   {index === 6 && <BrainCircuit size={18} />}
+                  {index === 7 && <BrainCircuit size={18} />}
                 </span>
               </Link>
             </li>

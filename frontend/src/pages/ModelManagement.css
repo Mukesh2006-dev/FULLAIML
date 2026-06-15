@@ -1,0 +1,299 @@
+/*
+   Model Management — Cyber-Dark Neon Glassmorphism
+   Matches the project's existing visual system
+*/
+
+.models-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding-bottom: 3rem;
+}
+
+.models-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.models-title-section h1 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.25rem 0;
+  letter-spacing: -0.02em;
+}
+
+.models-title-section p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* ── Stats Bar ── */
+.models-stats-bar {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.model-stat-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  backdrop-filter: blur(12px);
+}
+
+.model-stat-chip strong {
+  color: var(--accent-primary);
+  font-size: 1.1rem;
+}
+
+/* ── Filter Bar ── */
+.models-filter-bar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.models-filter-bar select {
+  padding: 0.6rem 1rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  outline: none;
+  transition: all var(--transition-fast);
+  min-width: 180px;
+}
+
+.models-filter-bar select:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.08);
+}
+
+/* ── Table ── */
+.models-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-default);
+}
+
+.models-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
+.models-table thead {
+  background: var(--bg-inset);
+  position: sticky;
+  top: 0;
+}
+
+.models-table th {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border-bottom: 1px solid var(--border-default);
+  white-space: nowrap;
+}
+
+.models-table td {
+  padding: 0.85rem 1rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  vertical-align: middle;
+}
+
+.models-table tbody tr {
+  transition: background var(--transition-fast);
+}
+
+.models-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* ── Type Badge ── */
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.type-badge.classification {
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.type-badge.regression {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* ── Metric Chip ── */
+.metric-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-right: 0.75rem;
+}
+
+.metric-chip strong {
+  color: var(--accent-primary);
+}
+
+/* ── Actions ── */
+.model-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.model-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  overflow: visible;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 0;
+  box-shadow: none;
+  transition: all var(--transition-fast);
+}
+
+.model-action-btn:hover {
+  border-color: var(--border-focus);
+  color: var(--accent-primary);
+  background: rgba(0, 240, 255, 0.05);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.08);
+}
+
+.model-action-btn::before {
+  display: none;
+}
+
+.model-action-btn.danger:hover {
+  border-color: var(--border-danger);
+  color: var(--text-danger);
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.1);
+}
+
+/* ── Empty / Loading States ── */
+.models-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  border: 1px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-inset);
+}
+
+.models-empty-state svg {
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.models-empty-state h3 {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.models-empty-state p {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  max-width: 360px;
+}
+
+.models-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+}
+
+/* ── Model Name Cell ── */
+.model-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.model-name-cell svg {
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+/* ── Date Cell ── */
+.model-date-cell {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .models-stats-bar {
+    flex-direction: column;
+  }
+  
+  .models-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .models-filter-bar select {
+    min-width: unset;
+    width: 100%;
+  }
+}

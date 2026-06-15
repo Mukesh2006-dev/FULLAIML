@@ -9,7 +9,8 @@ import {
   BrainCircuit,
   FileSpreadsheet,
   AlertCircle,
-  Loader2
+  Loader2,
+  Crosshair
 } from "lucide-react";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
@@ -346,6 +347,13 @@ const Dashboard = () => {
                           title="Train ML Model"
                         >
                           <BrainCircuit size={16} className="train-ico" />
+                        </button>
+                        <button type="button"
+                          className="action-btn clickable"
+                          onClick={() => navigate(`/predictions`)}
+                          title="Predictions"
+                        >
+                          <Crosshair size={16} className="predict-ico" />
                         </button>
                         <button type="button"
                           className="action-btn clickable delete-btn"

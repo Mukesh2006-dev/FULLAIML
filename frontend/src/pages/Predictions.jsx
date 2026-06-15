@@ -25,9 +25,9 @@ const Predictions = () => {
   // Selection state
   const [datasets, setDatasets] = useState([]);
   const [datasetId, setDatasetId] = useState("");
-  const [problemType, setProblemType] = useState("classification");
   const [models, setModels] = useState([]);
   const [modelId, setModelId] = useState("");
+  const [loadingModels, setLoadingModels] = useState(false);
 
   // Input state
   const [jsonInput, setJsonInput] = useState("{\n  \n}");
@@ -54,31 +54,26 @@ const Predictions = () => {
     fetchDatasets();
   }, []);
 
-  // Fetch models when dataset or problem type changes
+  // Fetch models using /models/dataset/{id} — returns ALL models for dataset
   useEffect(() => {
     const fetchModels = async () => {
       if (!datasetId) return;
       setModels([]);
       setModelId("");
+      setLoadingModels(true);
       
-      const [res] = await safeApiCall(API.get(`/ml/compare/${problemType}`, {
-        params: { dataset_id: datasetId }
-      }));
+      const [res] = await safeApiCall(API.get(`/models/dataset/${datasetId}`));
       
       if (res && res.data) {
-        if (res.data.unique_models_count === 1 && res.data.model) {
-          setModels([res.data.model]);
-          setModelId(res.data.model.model_id.toString());
-        } else if (res.data.comparison) {
-          setModels(res.data.comparison);
-          if (res.data.comparison.length > 0) {
-            setModelId(res.data.comparison[0].model_id.toString());
-          }
+        setModels(res.data);
+        if (res.data.length > 0) {
+          setModelId(res.data[0].id.toString());
         }
       }
+      setLoadingModels(false);
     };
     fetchModels();
-  }, [datasetId, problemType]);
+  }, [datasetId]);
 
   // Fetch input schema
   useEffect(() => {
@@ -103,7 +98,7 @@ const Predictions = () => {
   const fetchHistory = async () => {
     if (!modelId) return;
     setLoading(true);
-    const [res] = await safeApiCall(API.get(`/predictions/${modelId}/history?limit=50`));
+    const [res] = await safeApiCall(API.get(`/predictions/${modelId}/history`));
     if (res) {
       setHistory(res.data);
     }
@@ -114,6 +109,7 @@ const Predictions = () => {
     if (activeTab === "history" && modelId) {
       fetchHistory();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, modelId]);
 
 
@@ -187,6 +183,9 @@ const Predictions = () => {
     return JSON.stringify(data, null, 2);
   };
 
+  // Find the selected model object for displaying metadata
+  const selectedModel = models.find(m => m.id.toString() === modelId);
+
   return (
     <div className="predictions-container page-enter">
       <div className="predictions-header">
@@ -222,39 +221,35 @@ const Predictions = () => {
               </select>
             </div>
 
-            <div className="radio-group">
-              <label>Problem Type</label>
-              <div className="radio-options">
-                <div 
-                  className={`radio-option ${problemType === 'classification' ? 'selected' : ''}`}
-                  onClick={() => setProblemType('classification')}
-                >
-                  Classification
-                </div>
-                <div 
-                  className={`radio-option ${problemType === 'regression' ? 'selected' : ''}`}
-                  onClick={() => setProblemType('regression')}
-                >
-                  Regression
-                </div>
-              </div>
-            </div>
-
             <div className="form-group">
               <label>Trained Model</label>
-              <select
-                value={modelId}
-                onChange={(e) => setModelId(e.target.value)}
-                disabled={models.length === 0}
-              >
-                {models.length === 0 && <option value="">No models found</option>}
-                {models.map((m) => (
-                  <option key={m.model_id} value={m.model_id}>
-                    {m.model_name} ({m.algorithm})
-                  </option>
-                ))}
-              </select>
+              {loadingModels ? (
+                <div className="loading-dropdown">
+                  <Loader2 className="animate-spin" size={14} />
+                  <span>Loading models…</span>
+                </div>
+              ) : (
+                <select
+                  value={modelId}
+                  onChange={(e) => setModelId(e.target.value)}
+                  disabled={models.length === 0}
+                >
+                  {models.length === 0 && <option value="">No models found for this dataset</option>}
+                  {models.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.model_name} — {m.algorithm} ({m.problem_type})
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
+
+            {selectedModel && (
+              <div className="model-info-badge page-enter">
+                <span className="model-info-type">{selectedModel.problem_type}</span>
+                <span className="model-info-target">Target: {selectedModel.target_column}</span>
+              </div>
+            )}
           </div>
         </div>
 
