@@ -17,7 +17,7 @@ import {
 import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
-import { useToast } from "../components/ToastContext";
+import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./ModelTraining.css";
 

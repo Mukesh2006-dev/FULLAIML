@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Loader2,
-  Database,
   BrainCircuit,
   FileJson,
   Upload,
@@ -11,9 +10,8 @@ import {
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import { motion } from "framer-motion";
 import API from "../utils/api";
-import { useToast } from "../components/ToastContext";
+import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
 import Papa from "papaparse";
 import "./Predictions.css";
@@ -34,7 +32,6 @@ const Predictions = () => {
   // Input state
   const [jsonInput, setJsonInput] = useState("{\n  \n}");
   const [csvFile, setCsvFile] = useState(null);
-  const [inputSchema, setInputSchema] = useState(null);
   const [loadingSchema, setLoadingSchema] = useState(false);
 
   // Result & History state
@@ -46,7 +43,7 @@ const Predictions = () => {
   // Fetch datasets
   useEffect(() => {
     const fetchDatasets = async () => {
-      const [res, err] = await safeApiCall(API.get("/datasets/"));
+      const [res] = await safeApiCall(API.get("/datasets/"));
       if (res) {
         setDatasets(res.data);
         if (res.data.length > 0) {
@@ -64,7 +61,7 @@ const Predictions = () => {
       setModels([]);
       setModelId("");
       
-      const [res, err] = await safeApiCall(API.get(`/ml/compare/${problemType}`, {
+      const [res] = await safeApiCall(API.get(`/ml/compare/${problemType}`, {
         params: { dataset_id: datasetId }
       }));
       
@@ -86,20 +83,16 @@ const Predictions = () => {
   // Fetch input schema
   useEffect(() => {
     if (!modelId) {
-      setInputSchema(null);
       setJsonInput("{\n  \n}");
       return;
     }
     const fetchSchema = async () => {
       setLoadingSchema(true);
-      const [res, err] = await safeApiCall(API.get(`/predictions/${modelId}/input-schema`));
+      const [res] = await safeApiCall(API.get(`/predictions/${modelId}/input-schema`));
       if (res && res.data) {
-        setInputSchema(res.data);
         const template = {};
         res.data.required_input_columns.forEach(col => template[col] = "");
         setJsonInput(JSON.stringify(template, null, 2));
-      } else {
-        setInputSchema(null);
       }
       setLoadingSchema(false);
     };
@@ -110,7 +103,7 @@ const Predictions = () => {
   const fetchHistory = async () => {
     if (!modelId) return;
     setLoading(true);
-    const [res, err] = await safeApiCall(API.get(`/predictions/${modelId}/history?limit=50`));
+    const [res] = await safeApiCall(API.get(`/predictions/${modelId}/history?limit=50`));
     if (res) {
       setHistory(res.data);
     }
@@ -131,7 +124,7 @@ const Predictions = () => {
     let parsedData;
     try {
       parsedData = JSON.parse(jsonInput);
-    } catch (e) {
+    } catch {
       setError("Invalid JSON format. Please check your input.");
       return;
     }

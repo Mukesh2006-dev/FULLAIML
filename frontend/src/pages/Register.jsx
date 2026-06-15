@@ -115,7 +115,7 @@ const Register = () => {
 
     setLoading(true);
 
-    const [_, err] = await safeApiCall(API.post("/auth/register", {
+    const [, err] = await safeApiCall(API.post("/auth/register", {
       username,
       email,
       age: parseInt(age, 10),

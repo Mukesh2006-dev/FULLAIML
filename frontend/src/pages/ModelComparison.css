@@ -46,18 +46,18 @@
 }
 
 /* ── Setup Card ── */
-.setup-card, .results-card {
+.comparison-container .setup-card, .comparison-container .results-card {
   padding: 2rem;
 }
 
-.setup-card h2, .results-card h2 {
+.comparison-container .setup-card h2, .comparison-container .results-card h2 {
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 700;
   margin-bottom: 0.5rem;
 }
 
-.card-desc {
+.comparison-container .card-desc {
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -67,20 +67,20 @@
 }
 
 /* ── Form Layout ── */
-.ml-form {
+.comparison-container .ml-form {
   display: flex;
   flex-direction: column;
   gap: 1.75rem;
   margin-top: 1rem;
 }
 
-.form-group {
+.comparison-container .form-group {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.form-group label {
+.comparison-container .form-group label {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 600;
@@ -89,7 +89,7 @@
   letter-spacing: 0.06em;
 }
 
-.form-group select {
+.comparison-container .form-group select {
   padding: 0.85rem;
   background: var(--bg-input);
   border: 1px solid var(--border-default);
@@ -102,20 +102,20 @@
   transition: all var(--transition-fast);
 }
 
-.form-group select:focus {
+.comparison-container .form-group select:focus {
   outline: none;
   border-color: var(--border-focus);
   box-shadow: 0 0 0 2px rgba(0, 240, 255, 0.2);
 }
 
 /* ── Radio Group ── */
-.radio-group {
+.comparison-container .radio-group {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
 }
 
-.radio-group label {
+.comparison-container .radio-group label {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 600;
@@ -124,12 +124,12 @@
   letter-spacing: 0.06em;
 }
 
-.radio-options {
+.comparison-container .radio-options {
   display: flex;
   gap: 1rem;
 }
 
-.radio-option {
+.comparison-container .radio-option {
   flex: 1;
   display: flex;
   align-items: center;
@@ -146,19 +146,19 @@
   transition: all var(--transition-fast);
 }
 
-.radio-option.selected {
+.comparison-container .radio-option.selected {
   background: rgba(0, 240, 255, 0.1);
   border-color: var(--accent-cyan);
   color: var(--text-primary);
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
 }
 
-.radio-option:hover:not(.selected) {
+.comparison-container .radio-option:hover:not(.selected) {
   border-color: var(--border-focus);
 }
 
 /* ── Button ── */
-.generate-btn {
+.comparison-container .generate-btn {
   padding: 0.75rem;
   background: var(--gradient-btn-primary);
   border: none;
@@ -177,19 +177,19 @@
   width: 100%;
 }
 
-.generate-btn:hover:not(:disabled) {
+.comparison-container .generate-btn:hover:not(:disabled) {
   background: var(--gradient-btn-hover);
   box-shadow: 0 6px 24px rgba(0, 224, 236, 0.3);
   transform: translateY(-1px);
 }
 
-.generate-btn:disabled {
+.comparison-container .generate-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
 /* ── Idle State ── */
-.idle-display {
+.comparison-container .idle-display {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -202,18 +202,18 @@
   background: var(--bg-inset);
 }
 
-.idle-icon {
+.comparison-container .idle-icon {
   color: var(--text-muted);
   margin-bottom: 1.5rem;
 }
 
-.idle-display h3 {
+.comparison-container .idle-display h3 {
   font-family: var(--font-display);
   color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
-.idle-display p {
+.comparison-container .idle-display p {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   max-width: 320px;
@@ -271,7 +271,7 @@
   gap: 0.5rem;
 }
 
-.metric-label {
+.comparison-container .metric-label {
   font-family: var(--font-mono);
   font-size: 0.7rem;
   color: var(--text-muted);
@@ -279,7 +279,7 @@
   letter-spacing: 0.05em;
 }
 
-.metric-value {
+.comparison-container .metric-value {
   font-family: var(--font-mono);
   font-size: 1.25rem;
   font-weight: 700;

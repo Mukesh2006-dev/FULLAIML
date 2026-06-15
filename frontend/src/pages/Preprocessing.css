@@ -66,7 +66,7 @@
   font-weight: 700;
 }
 
-.card-desc {
+.preprocess-container .card-desc {
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -99,7 +99,7 @@
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.08);
 }
 
-.loading-dropdown {
+.preprocess-container .loading-dropdown {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -220,7 +220,7 @@
   flex: 1;
 }
 
-.idle-icon {
+.preprocess-container .idle-icon {
   color: var(--text-muted);
   margin-bottom: 1rem;
 }
@@ -262,7 +262,7 @@
 }
 
 /* ── Results Panel — Report ── */
-.report-success-header {
+.preprocess-container .report-success-header {
   display: flex;
   align-items: center;
   gap: 0.75rem;
@@ -277,7 +277,7 @@
   margin-bottom: 1.5rem;
 }
 
-.success-ico {
+.preprocess-container .success-ico {
   color: var(--accent-green);
   filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.4));
 }

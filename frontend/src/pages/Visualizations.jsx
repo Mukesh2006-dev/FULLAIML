@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { motion } from "framer-motion";
 import API from "../utils/api";
-import { useToast } from "../components/ToastContext";
+import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./Visualizations.css";
 

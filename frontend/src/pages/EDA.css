@@ -78,7 +78,7 @@
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.08);
 }
 
-.loading-dropdown {
+.eda-container .loading-dropdown {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -173,7 +173,7 @@
   gap: 0.5rem;
 }
 
-.metric-label {
+.eda-container .metric-label {
   font-family: var(--font-mono);
   font-size: 0.68rem;
   font-weight: 600;
@@ -182,7 +182,7 @@
   color: var(--text-muted);
 }
 
-.metric-value {
+.eda-container .metric-value {
   font-family: var(--font-display);
   font-size: 2rem;
   font-weight: 800;
@@ -501,7 +501,7 @@
 }
 
 /* ── Empty State ── */
-.empty-state {
+.eda-container .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -511,18 +511,18 @@
   color: var(--text-secondary);
 }
 
-.empty-state .empty-icon {
+.eda-container .empty-state .empty-icon {
   color: var(--text-muted);
   margin-bottom: 1rem;
 }
 
-.empty-state h3 {
+.eda-container .empty-state h3 {
   font-family: var(--font-display);
   color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
-.empty-state p {
+.eda-container .empty-state p {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   max-width: 320px;

@@ -98,7 +98,7 @@
   padding-bottom: 0.75rem;
 }
 
-.info-row {
+.profile-container .info-row {
   display: flex;
   align-items: center;
   gap: 1.5rem;
@@ -110,12 +110,12 @@
   transition: all var(--transition-fast);
 }
 
-.info-row:hover {
+.profile-container .info-row:hover {
   background: rgba(255, 255, 255, 0.02);
   border-color: var(--border-glow);
 }
 
-.info-icon {
+.profile-container .info-icon {
   width: 40px;
   height: 40px;
   border-radius: 50%;
@@ -133,7 +133,7 @@
   gap: 0.25rem;
 }
 
-.info-label {
+.profile-container .info-label {
   font-family: var(--font-mono);
   font-size: 0.75rem;
   color: var(--text-muted);
@@ -141,7 +141,7 @@
   letter-spacing: 0.05em;
 }
 
-.info-value {
+.profile-container .info-value {
   font-family: var(--font-sans);
   font-size: 1.1rem;
   font-weight: 500;

@@ -50,17 +50,17 @@
 }
 
 /* ── Cards ── */
-.setup-card, .display-card {
+.visualizations-container .setup-card, .visualizations-container .display-card {
   padding: 2rem;
 }
 
-.setup-card h2, .display-card h2 {
+.visualizations-container .setup-card h2, .visualizations-container .display-card h2 {
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 700;
 }
 
-.card-desc {
+.visualizations-container .card-desc {
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.72rem;
@@ -117,7 +117,7 @@
   gap: 1rem;
 }
 
-.field-hint {
+.visualizations-container .field-hint {
   font-family: var(--font-mono);
   font-size: 0.65rem;
   color: var(--text-muted);
@@ -159,7 +159,7 @@
 }
 
 /* ── Loading ── */
-.loading-columns {
+.visualizations-container .loading-columns {
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -189,7 +189,7 @@
 }
 
 /* ── Generate Button ── */
-.generate-btn {
+.visualizations-container .generate-btn {
   padding: 0.75rem;
   background: var(--gradient-btn-primary);
   border: none;
@@ -207,19 +207,19 @@
   transition: all var(--transition-fast);
 }
 
-.generate-btn:hover:not(:disabled) {
+.visualizations-container .generate-btn:hover:not(:disabled) {
   background: var(--gradient-btn-hover);
   box-shadow: 0 6px 24px rgba(0, 224, 236, 0.3);
   transform: translateY(-1px);
 }
 
-.generate-btn:disabled {
+.visualizations-container .generate-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
 }
 
 /* ═══════════ Render Area ═══════════ */
-.idle-display, .rendering-placeholder {
+.visualizations-container .idle-display, .visualizations-container .rendering-placeholder {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -244,13 +244,13 @@
   margin-bottom: 1.5rem;
 }
 
-.idle-display h3, .rendering-placeholder h3 {
+.visualizations-container .idle-display h3, .visualizations-container .rendering-placeholder h3 {
   font-family: var(--font-display);
   color: var(--text-primary);
   margin-bottom: 0.5rem;
 }
 
-.idle-display p, .rendering-placeholder p {
+.visualizations-container .idle-display p, .visualizations-container .rendering-placeholder p {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   max-width: 320px;
@@ -306,25 +306,25 @@
   filter: drop-shadow(0 0 4px rgba(0, 240, 255, 0.3));
 }
 
-.meta-stats-list {
+.visualizations-container .meta-stats-list {
   display: flex;
   flex-direction: column;
   gap: 0.55rem;
   margin-bottom: 1.5rem;
 }
 
-.meta-stat-row {
+.visualizations-container .meta-stat-row {
   display: flex;
   justify-content: space-between;
   font-family: var(--font-mono);
   font-size: 0.78rem;
 }
 
-.meta-stat-row span {
+.visualizations-container .meta-stat-row span {
   color: var(--text-muted);
 }
 
-.meta-stat-row strong {
+.visualizations-container .meta-stat-row strong {
   color: var(--text-cyan);
 }
 

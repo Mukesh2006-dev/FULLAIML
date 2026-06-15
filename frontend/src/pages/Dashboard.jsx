@@ -106,7 +106,7 @@ const Dashboard = () => {
     const formData = new FormData();
     formData.append("file", file);
 
-    const [_, err] = await safeApiCall(API.post("/datasets/upload", formData, {
+    const [, err] = await safeApiCall(API.post("/datasets/upload", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },

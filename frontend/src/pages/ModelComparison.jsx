@@ -1,16 +1,15 @@
-import { useState, useEffect, lazy, Suspense } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   Scale,
   ArrowLeft,
   Loader2,
   Trophy,
-  Database,
   BarChart2
 } from "lucide-react";
 import { motion } from "framer-motion";
 import API from "../utils/api";
-import { useToast } from "../components/ToastContext";
+import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./ModelComparison.css";
 

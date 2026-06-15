@@ -1,13 +1,21 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { Info, CheckCircle, XCircle, X } from 'lucide-react';
+import { ToastContext } from './toastContext';
 import './Toast.css';
-
-const ToastContext = createContext(null);
 
 let idCounter = 0;
 
 export const ToastProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
+
+  const removeToast = useCallback((id) => {
+    setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
+    
+    // Give animation time to play before actual unmount
+    setTimeout(() => {
+      setToasts(prev => prev.filter(t => t.id !== id));
+    }, 300);
+  }, []);
 
   const addToast = useCallback((title, description, type = 'info', duration = 5000) => {
     const id = idCounter++;
@@ -18,16 +26,7 @@ export const ToastProvider = ({ children }) => {
         removeToast(id);
       }, duration);
     }
-  }, []);
-
-  const removeToast = useCallback((id) => {
-    setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
-    
-    // Give animation time to play before actual unmount
-    setTimeout(() => {
-      setToasts(prev => prev.filter(t => t.id !== id));
-    }, 300);
-  }, []);
+  }, [removeToast]);
 
   return (
     <ToastContext.Provider value={{ addToast, removeToast }}>
@@ -68,12 +67,4 @@ export const ToastProvider = ({ children }) => {
       </div>
     </ToastContext.Provider>
   );
-};
-
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
 };
