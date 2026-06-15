@@ -34,6 +34,8 @@ const Predictions = () => {
   // Input state
   const [jsonInput, setJsonInput] = useState("{\n  \n}");
   const [csvFile, setCsvFile] = useState(null);
+  const [inputSchema, setInputSchema] = useState(null);
+  const [loadingSchema, setLoadingSchema] = useState(false);
 
   // Result & History state
   const [loading, setLoading] = useState(false);
@@ -81,6 +83,29 @@ const Predictions = () => {
     fetchModels();
   }, [datasetId, problemType]);
 
+  // Fetch input schema
+  useEffect(() => {
+    if (!modelId) {
+      setInputSchema(null);
+      setJsonInput("{\n  \n}");
+      return;
+    }
+    const fetchSchema = async () => {
+      setLoadingSchema(true);
+      const [res, err] = await safeApiCall(API.get(`/predictions/${modelId}/input-schema`));
+      if (res && res.data) {
+        setInputSchema(res.data);
+        const template = {};
+        res.data.required_input_columns.forEach(col => template[col] = "");
+        setJsonInput(JSON.stringify(template, null, 2));
+      } else {
+        setInputSchema(null);
+      }
+      setLoadingSchema(false);
+    };
+    fetchSchema();
+  }, [modelId]);
+
   // Fetch history
   const fetchHistory = async () => {
     if (!modelId) return;
@@ -97,6 +122,7 @@ const Predictions = () => {
       fetchHistory();
     }
   }, [activeTab, modelId]);
+
 
   const handleSinglePrediction = async () => {
     setError(null);
@@ -279,16 +305,24 @@ const Predictions = () => {
               {/* SINGLE TAB */}
               {activeTab === 'single' && (
                 <div>
-                  <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Enter Input JSON</h3>
-                  <p className="card-desc" style={{ marginBottom: '1rem' }}>
-                    Provide the feature keys and values exactly as they appeared in the training dataset.
-                  </p>
-                  <textarea 
-                    className="json-editor"
-                    value={jsonInput}
-                    onChange={(e) => setJsonInput(e.target.value)}
-                    placeholder='{"feature1": 10.5, "feature2": "category"}'
-                  />
+                  {loadingSchema ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+                      <Loader2 className="animate-spin text-accent-cyan" size={32} />
+                    </div>
+                  ) : (
+                    <div>
+                      <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Enter Input JSON</h3>
+                      <p className="card-desc" style={{ marginBottom: '1rem' }}>
+                        Provide the feature keys and values exactly as they appeared in the training dataset.
+                      </p>
+                      <textarea 
+                        className="json-editor"
+                        value={jsonInput}
+                        onChange={(e) => setJsonInput(e.target.value)}
+                        placeholder='{"feature1": 10.5, "feature2": "category"}'
+                      />
+                    </div>
+                  )}
                   <button 
                     className="generate-btn clickable" 
                     onClick={handleSinglePrediction}

@@ -11,7 +11,8 @@ import {
   Award,
   BarChart3,
   ScatterChart,
-  Scale
+  Scale,
+  ListChecks
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
@@ -48,6 +49,8 @@ const ModelTraining = () => {
   const [training, setTraining] = useState(false);
   const [error, setError] = useState("");
   const [trainResult, setTrainResult] = useState(null);
+
+  const selectedFeatureColumns = columns.filter((column) => column !== targetColumn);
 
   useEffect(() => {
     const fetchDatasets = async () => {
@@ -106,6 +109,11 @@ const ModelTraining = () => {
     e.preventDefault();
     if (!selectedDatasetId || !targetColumn || !modelName) {
       setError("Please fill in all required training parameters.");
+      return;
+    }
+
+    if (selectedFeatureColumns.length === 0) {
+      setError("Select a dataset with at least one input column besides the target.");
       return;
     }
 
@@ -269,6 +277,26 @@ const ModelTraining = () => {
                   <span className="field-hint">The column you want the model to predict.</span>
                 </div>
               )
+            )}
+
+            {!loadingColumns && columns.length > 0 && targetColumn && (
+              <div className="training-inputs-panel page-enter">
+                <div className="training-inputs-header">
+                  <div>
+                    <span className="training-inputs-kicker">Training Inputs</span>
+                    <strong>{selectedFeatureColumns.length} feature columns</strong>
+                  </div>
+                  <ListChecks size={18} />
+                </div>
+
+                <div className="feature-chip-list" aria-label="Feature columns used for model training">
+                  {selectedFeatureColumns.map((column) => (
+                    <span key={column} className="feature-chip" title={column}>
+                      {column}
+                    </span>
+                  ))}
+                </div>
+              </div>
             )}
 
             {/* Hyperparameter Accordion */}

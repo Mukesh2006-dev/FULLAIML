@@ -122,7 +122,7 @@ const Navbar = () => {
     <nav
       className={`relative mx-auto z-50 flex items-center justify-between backdrop-blur-2xl backdrop-saturate-[1.6] transition-all duration-700 ease-out w-full ${
         isScrolled
-          ? "mt-5 max-w-[1000px] px-2.5 py-1.5 gap-3 rounded-full bg-transparent border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.9),0_0_20px_rgba(255,255,255,0.03),inset_0_1px_0_rgba(255,255,255,0.08)] hover:bg-white/5"
+          ? "mt-5 max-w-[1150px] px-2.5 py-1.5 gap-3 rounded-full bg-transparent border border-white/10 shadow-[0_12px_32px_rgba(0,0,0,0.5),0_0_0_1px_rgba(0,0,0,0.8),inset_0_1px_0_rgba(255,255,255,0.05)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.6),0_0_0_1px_rgba(0,0,0,0.9),0_0_20px_rgba(255,255,255,0.03),inset_0_1px_0_rgba(255,255,255,0.08)] hover:bg-white/5"
           : "mt-0 max-w-full px-8 py-3 rounded-none bg-transparent border border-transparent border-b-white/5 shadow-none"
       } max-sm:px-1.5 max-sm:gap-1 max-sm:rounded-full max-sm:border-white/10 max-sm:bg-bg-root/80 max-sm:w-[95%]`}
     >
@@ -157,7 +157,7 @@ const Navbar = () => {
               <Link
                 to={item.path}
                 ref={(el) => (linkRefs.current[index] = el)}
-                className={`relative flex items-center gap-1.5 px-3.5 py-2 rounded-full font-sans text-sm font-medium transition-colors duration-300 whitespace-nowrap no-underline border-none bg-transparent z-10 ${
+                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full font-sans text-sm font-medium transition-colors duration-300 whitespace-nowrap no-underline border-none bg-transparent z-10 ${
                   isActive ? "text-text-primary" : "text-white/60 hover:text-text-primary"
                 } max-lg:px-2.5 max-sm:px-2 max-sm:text-xs`}
               >
