@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   BrainCircuit,
@@ -12,7 +12,11 @@ import {
   BarChart3,
   ScatterChart,
   Scale,
-  ListChecks
+  ListChecks,
+  Circle,
+  XCircle,
+  Clock,
+  Zap,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
@@ -20,6 +24,89 @@ import API from "../utils/api";
 import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./ModelTraining.css";
+
+const POLL_INTERVAL = 1500;
+
+/* ── Circular progress ring component ── */
+const ProgressRing = ({ progress }) => {
+  const radius = 60;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (progress / 100) * circumference;
+
+  return (
+    <div className="progress-ring-wrapper">
+      <svg className="progress-ring-svg" viewBox="0 0 140 140">
+        <defs>
+          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#00f0ff" />
+            <stop offset="100%" stopColor="#7c3aed" />
+          </linearGradient>
+        </defs>
+        <circle className="progress-ring-bg" cx="70" cy="70" r={radius} />
+        <circle
+          className={`progress-ring-fill ${progress < 100 ? "animating" : ""}`}
+          cx="70"
+          cy="70"
+          r={radius}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+        />
+      </svg>
+      <div className="progress-ring-text">
+        {progress}<span>%</span>
+      </div>
+    </div>
+  );
+};
+
+/* ── Status badge component ── */
+const StatusBadge = ({ status }) => {
+  const icons = {
+    pending: <Clock size={12} />,
+    running: <Zap size={12} />,
+    completed: <CheckCircle size={12} />,
+    failed: <XCircle size={12} />,
+  };
+
+  return (
+    <span className={`job-status-badge ${status}`}>
+      {icons[status] || <Circle size={12} />}
+      {status}
+    </span>
+  );
+};
+
+/* ── Step progress indicators ── */
+const TRAINING_STEPS = [
+  { threshold: 0, label: "Job created — queued" },
+  { threshold: 10, label: "Training job started" },
+  { threshold: 30, label: "Loading dataset & preprocessing" },
+  { threshold: 100, label: "Model trained & saved" },
+];
+
+const StepIndicators = ({ progress }) => (
+  <div className="job-steps-list">
+    {TRAINING_STEPS.map((step, i) => {
+      const isDone = progress > step.threshold || (progress === 100 && step.threshold === 100);
+      const isActive = !isDone && progress >= (TRAINING_STEPS[i - 1]?.threshold ?? 0);
+      return (
+        <div
+          key={step.threshold}
+          className={`job-step-item ${isDone ? "done" : ""} ${isActive ? "active" : ""}`}
+        >
+          {isDone ? (
+            <CheckCircle size={13} />
+          ) : isActive ? (
+            <Loader2 size={13} className="animate-spin" />
+          ) : (
+            <Circle size={13} />
+          )}
+          {step.label}
+        </div>
+      );
+    })}
+  </div>
+);
 
 const ModelTraining = () => {
   const [searchParams] = useSearchParams();
@@ -50,8 +137,16 @@ const ModelTraining = () => {
   const [error, setError] = useState("");
   const [trainResult, setTrainResult] = useState(null);
 
+  // Async job states
+  const [jobId, setJobId] = useState(null);
+  const [jobProgress, setJobProgress] = useState(0);
+  const [jobMessage, setJobMessage] = useState("");
+  const [jobStatus, setJobStatus] = useState(null); // pending | running | completed | failed
+  const pollRef = useRef(null);
+
   const selectedFeatureColumns = columns.filter((column) => column !== targetColumn);
 
+  // ── Fetch datasets ──
   useEffect(() => {
     const fetchDatasets = async () => {
       setLoadingDatasets(true);
@@ -71,6 +166,7 @@ const ModelTraining = () => {
     fetchDatasets();
   }, []);
 
+  // ── Fetch columns when dataset changes ──
   useEffect(() => {
     if (!selectedDatasetId) return;
 
@@ -101,6 +197,76 @@ const ModelTraining = () => {
     setAlgorithm("random_forest");
   }, [problemType]);
 
+  // ── Cleanup polling on unmount ──
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current);
+    };
+  }, []);
+
+  // ── Poll job status ──
+  const startPolling = useCallback((id) => {
+    if (pollRef.current) clearInterval(pollRef.current);
+
+    pollRef.current = setInterval(async () => {
+      const [res, err] = await safeApiCall(API.get(`/jobs/${id}`));
+      if (err) {
+        console.error("Polling error:", err);
+        return;
+      }
+
+      if (!res) return;
+
+      const job = res.data;
+      setJobProgress(job.progress);
+      setJobMessage(job.message || "");
+      setJobStatus(job.status);
+
+      if (job.status === "completed") {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+
+        // Parse model ID from message: "Model trained successfully. Model ID: X"
+        const modelIdMatch = job.message?.match(/Model ID:\s*(\d+)/i);
+        if (modelIdMatch) {
+          const modelId = parseInt(modelIdMatch[1]);
+          // Fetch model details with metrics
+          const [modelRes, modelErr] = await safeApiCall(API.get(`/models/${modelId}`));
+          if (modelErr) {
+            setError("Training completed but failed to fetch model details.");
+          } else if (modelRes) {
+            const model = modelRes.data;
+            setTrainResult({
+              message: "Model trained successfully",
+              model_id: model.id,
+              model_name: model.model_name,
+              algorithm: model.algorithm,
+              problem_type: model.problem_type,
+              target_column: model.target_column,
+              metrics: model.metrics,
+              model_path: model.model_path,
+            });
+            addToast(
+              "Model Training Complete",
+              `Model "${model.model_name}" has been trained and validated successfully.`,
+              "success"
+            );
+          }
+        } else {
+          addToast("Training Complete", job.message || "Job finished.", "success");
+        }
+
+        setTraining(false);
+      } else if (job.status === "failed") {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+        setError(job.message || "Training job failed.");
+        setTraining(false);
+        addToast("Training Failed", job.message || "The training job encountered an error.", "error");
+      }
+    }, POLL_INTERVAL);
+  }, [addToast]);
+
   const handleDatasetChange = (e) => {
     setSelectedDatasetId(e.target.value);
   };
@@ -120,6 +286,10 @@ const ModelTraining = () => {
     setError("");
     setTrainResult(null);
     setTraining(true);
+    setJobId(null);
+    setJobProgress(0);
+    setJobMessage("Submitting training job…");
+    setJobStatus("pending");
 
     const hyperparameters = {};
     if (algorithm === "random_forest") {
@@ -129,7 +299,7 @@ const ModelTraining = () => {
       }
     }
 
-    const [response, err] = await safeApiCall(API.post("/ml/train", {
+    const [response, err] = await safeApiCall(API.post("/jobs/train-model", {
       dataset_id: parseInt(selectedDatasetId),
       model_name: modelName,
       algorithm,
@@ -142,17 +312,18 @@ const ModelTraining = () => {
 
     if (err) {
       setError(
-        err.response?.data?.detail || "Training failed. Check columns compatibility (avoid string columns as targets without cleaning)."
+        err.response?.data?.detail || "Failed to submit training job."
       );
+      setTraining(false);
+      setJobStatus(null);
     } else if (response) {
-      setTrainResult(response.data);
-      addToast(
-        "Model Training Complete",
-        `Model "${modelName}" has been trained and validated successfully.`,
-        "success"
-      );
+      const job = response.data;
+      setJobId(job.id);
+      setJobProgress(job.progress);
+      setJobMessage(job.message || "Job created");
+      setJobStatus(job.status);
+      startPolling(job.id);
     }
-    setTraining(false);
   };
 
   return (
@@ -375,7 +546,7 @@ const ModelTraining = () => {
               {training ? (
                 <>
                   <Loader2 className="animate-spin" size={18} />
-                  Training Model…
+                  Training in Progress…
                 </>
               ) : (
                 "Start Model Training"
@@ -390,10 +561,12 @@ const ModelTraining = () => {
           <p className="card-desc">Validation performance metrics and weights report</p>
 
           {training ? (
-            <div className="training-running">
-              <Loader2 className="animate-spin training-spin-ico" size={44} />
-              <h3>Training Algorithmic Network…</h3>
-              <p>Performing train-test split, label encoding categoricals, fitting model parameters, and running validation metrics.</p>
+            /* ── Async Job Progress UI ── */
+            <div className="job-progress-container page-enter">
+              <StatusBadge status={jobStatus || "pending"} />
+              <ProgressRing progress={jobProgress} />
+              <p className="job-message-text">{jobMessage}</p>
+              <StepIndicators progress={jobProgress} />
             </div>
           ) : trainResult ? (
             <div className="training-report-container page-enter">
