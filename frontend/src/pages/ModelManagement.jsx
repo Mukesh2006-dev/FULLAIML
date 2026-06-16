@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPortal } from "react-dom";
 import {
   ArrowLeft,
   Loader2,
@@ -259,8 +260,8 @@ const ModelManagement = () => {
         </div>
       )}
 
-      {/* Delete Confirmation */}
-      {deleteTarget && (
+      {/* Delete Confirmation — rendered via portal to ensure viewport centering */}
+      {deleteTarget && createPortal(
         <div
           className="modal-backdrop"
           style={{
@@ -271,7 +272,7 @@ const ModelManagement = () => {
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
-            zIndex: 100,
+            zIndex: 9999,
           }}
           onClick={() => !deleting && setDeleteTarget(null)}
         >
@@ -352,7 +353,8 @@ const ModelManagement = () => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

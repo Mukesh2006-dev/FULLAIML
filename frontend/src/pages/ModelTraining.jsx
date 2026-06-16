@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   BrainCircuit,
@@ -17,15 +17,16 @@ import {
   XCircle,
   Clock,
   Zap,
+  Plus,
+  X,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
-import { useToast } from "../components/useToast";
+import { useTrainingJob } from "../components/TrainingJobContext";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./ModelTraining.css";
 
-const POLL_INTERVAL = 1500;
 
 /* ── Circular progress ring component ── */
 const ProgressRing = ({ progress }) => {
@@ -111,8 +112,22 @@ const StepIndicators = ({ progress }) => (
 const ModelTraining = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { addToast } = useToast();
   const queryDatasetId = searchParams.get("dataset_id");
+
+  // Use global training job context (persists across page navigations)
+  const {
+    jobProgress,
+    jobMessage,
+    jobStatus,
+    training,
+    trainResult,
+    trainError,
+    formBusy,
+    startTrainingJob,
+    startNewJob,
+    jobHistory,
+    removeJobFromHistory,
+  } = useTrainingJob();
 
   const [datasets, setDatasets] = useState([]);
   const [selectedDatasetId, setSelectedDatasetId] = useState(queryDatasetId || "");
@@ -132,17 +147,8 @@ const ModelTraining = () => {
   const [nEstimators, setNEstimators] = useState(100);
   const [maxDepth, setMaxDepth] = useState("");
 
-  // Result states
-  const [training, setTraining] = useState(false);
+  // Local UI error (distinct from context trainError)
   const [error, setError] = useState("");
-  const [trainResult, setTrainResult] = useState(null);
-
-  // Async job states
-  const [jobId, setJobId] = useState(null);
-  const [jobProgress, setJobProgress] = useState(0);
-  const [jobMessage, setJobMessage] = useState("");
-  const [jobStatus, setJobStatus] = useState(null); // pending | running | completed | failed
-  const pollRef = useRef(null);
 
   const selectedFeatureColumns = columns.filter((column) => column !== targetColumn);
 
@@ -173,7 +179,6 @@ const ModelTraining = () => {
     const fetchColumns = async () => {
       setError("");
       setLoadingColumns(true);
-      setTrainResult(null);
 
       const [response, error] = await safeApiCall(API.get(`/analysis/${selectedDatasetId}/summary`));
       if (error) {
@@ -197,76 +202,6 @@ const ModelTraining = () => {
     setAlgorithm("random_forest");
   }, [problemType]);
 
-  // ── Cleanup polling on unmount ──
-  useEffect(() => {
-    return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
-    };
-  }, []);
-
-  // ── Poll job status ──
-  const startPolling = useCallback((id) => {
-    if (pollRef.current) clearInterval(pollRef.current);
-
-    pollRef.current = setInterval(async () => {
-      const [res, err] = await safeApiCall(API.get(`/jobs/${id}`));
-      if (err) {
-        console.error("Polling error:", err);
-        return;
-      }
-
-      if (!res) return;
-
-      const job = res.data;
-      setJobProgress(job.progress);
-      setJobMessage(job.message || "");
-      setJobStatus(job.status);
-
-      if (job.status === "completed") {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-
-        // Parse model ID from message: "Model trained successfully. Model ID: X"
-        const modelIdMatch = job.message?.match(/Model ID:\s*(\d+)/i);
-        if (modelIdMatch) {
-          const modelId = parseInt(modelIdMatch[1]);
-          // Fetch model details with metrics
-          const [modelRes, modelErr] = await safeApiCall(API.get(`/models/${modelId}`));
-          if (modelErr) {
-            setError("Training completed but failed to fetch model details.");
-          } else if (modelRes) {
-            const model = modelRes.data;
-            setTrainResult({
-              message: "Model trained successfully",
-              model_id: model.id,
-              model_name: model.model_name,
-              algorithm: model.algorithm,
-              problem_type: model.problem_type,
-              target_column: model.target_column,
-              metrics: model.metrics,
-              model_path: model.model_path,
-            });
-            addToast(
-              "Model Training Complete",
-              `Model "${model.model_name}" has been trained and validated successfully.`,
-              "success"
-            );
-          }
-        } else {
-          addToast("Training Complete", job.message || "Job finished.", "success");
-        }
-
-        setTraining(false);
-      } else if (job.status === "failed") {
-        clearInterval(pollRef.current);
-        pollRef.current = null;
-        setError(job.message || "Training job failed.");
-        setTraining(false);
-        addToast("Training Failed", job.message || "The training job encountered an error.", "error");
-      }
-    }, POLL_INTERVAL);
-  }, [addToast]);
-
   const handleDatasetChange = (e) => {
     setSelectedDatasetId(e.target.value);
   };
@@ -284,12 +219,6 @@ const ModelTraining = () => {
     }
 
     setError("");
-    setTrainResult(null);
-    setTraining(true);
-    setJobId(null);
-    setJobProgress(0);
-    setJobMessage("Submitting training job…");
-    setJobStatus("pending");
 
     const hyperparameters = {};
     if (algorithm === "random_forest") {
@@ -299,31 +228,19 @@ const ModelTraining = () => {
       }
     }
 
-    const [response, err] = await safeApiCall(API.post("/jobs/train-model", {
-      dataset_id: parseInt(selectedDatasetId),
-      model_name: modelName,
-      algorithm,
-      problem_type: problemType,
-      target_column: targetColumn,
-      test_size: parseFloat(testSize),
-      random_state: parseInt(randomState),
-      hyperparameters,
-    }));
-
-    if (err) {
-      setError(
-        err.response?.data?.detail || "Failed to submit training job."
-      );
-      setTraining(false);
-      setJobStatus(null);
-    } else if (response) {
-      const job = response.data;
-      setJobId(job.id);
-      setJobProgress(job.progress);
-      setJobMessage(job.message || "Job created");
-      setJobStatus(job.status);
-      startPolling(job.id);
-    }
+    await startTrainingJob(
+      {
+        dataset_id: parseInt(selectedDatasetId),
+        model_name: modelName,
+        algorithm,
+        problem_type: problemType,
+        target_column: targetColumn,
+        test_size: parseFloat(testSize),
+        random_state: parseInt(randomState),
+        hyperparameters,
+      },
+      { datasetId: selectedDatasetId, problemType }
+    );
   };
 
   return (
@@ -339,7 +256,7 @@ const ModelTraining = () => {
         </div>
       </div>
 
-      {error && <div className="ml-alert error-bg">{error}</div>}
+      {(error || trainError) && <div className="ml-alert error-bg">{error || trainError}</div>}
 
       <div className="ml-grid">
         {/* Configurations Form */}
@@ -360,7 +277,7 @@ const ModelTraining = () => {
                   id="ml-dataset"
                   value={selectedDatasetId}
                   onChange={handleDatasetChange}
-                  disabled={training}
+                  disabled={formBusy}
                   aria-label="Dataset Source"
                 >
                   {datasets.length === 0 && <option value="">No datasets uploaded yet</option>}
@@ -382,7 +299,7 @@ const ModelTraining = () => {
                 value={modelName}
                 onChange={(e) => setModelName(e.target.value)}
                 required
-                disabled={training}
+                disabled={formBusy}
                 aria-label="Model Name"
               />
             </div>
@@ -394,7 +311,7 @@ const ModelTraining = () => {
                   id="ml-problem-type"
                   value={problemType}
                   onChange={(e) => setProblemType(e.target.value)}
-                  disabled={training}
+                  disabled={formBusy}
                 >
                   <option value="classification">Classification</option>
                   <option value="regression">Regression</option>
@@ -407,7 +324,7 @@ const ModelTraining = () => {
                   id="ml-algo"
                   value={algorithm}
                   onChange={(e) => setAlgorithm(e.target.value)}
-                  disabled={training}
+                  disabled={formBusy}
                 >
                   {problemType === "classification" ? (
                     <>
@@ -437,7 +354,7 @@ const ModelTraining = () => {
                     id="ml-target"
                     value={targetColumn}
                     onChange={(e) => setTargetColumn(e.target.value)}
-                    disabled={training}
+                    disabled={formBusy}
                   >
                     {columns.map((c) => (
                       <option key={c} value={c}>
@@ -489,7 +406,7 @@ const ModelTraining = () => {
                       step="0.05"
                       value={testSize}
                       onChange={(e) => setTestSize(e.target.value)}
-                      disabled={training}
+                      disabled={formBusy}
                       aria-label="Test Split Size"
                     />
                   </div>
@@ -500,7 +417,7 @@ const ModelTraining = () => {
                       type="number"
                       value={randomState}
                       onChange={(e) => setRandomState(e.target.value)}
-                      disabled={training}
+                      disabled={formBusy}
                       aria-label="Random State"
                     />
                   </div>
@@ -517,7 +434,7 @@ const ModelTraining = () => {
                         max="1000"
                         value={nEstimators}
                         onChange={(e) => setNEstimators(e.target.value)}
-                        disabled={training}
+                        disabled={formBusy}
                         aria-label="Estimators"
                       />
                     </div>
@@ -529,7 +446,7 @@ const ModelTraining = () => {
                         placeholder="Unlimited"
                         value={maxDepth}
                         onChange={(e) => setMaxDepth(e.target.value)}
-                        disabled={training}
+                        disabled={formBusy}
                         aria-label="Max Depth"
                       />
                     </div>
@@ -541,7 +458,7 @@ const ModelTraining = () => {
             <button
               type="submit"
               className="train-btn clickable"
-              disabled={training || loadingColumns || !selectedDatasetId}
+              disabled={formBusy || loadingColumns || !selectedDatasetId}
             >
               {training ? (
                 <>
@@ -552,6 +469,22 @@ const ModelTraining = () => {
                 "Start Model Training"
               )}
             </button>
+
+            {/* Start New Job button — shown when training or results are visible */}
+            {(training || trainResult) && (
+              <button
+                type="button"
+                className="new-job-btn clickable"
+                onClick={() => {
+                  startNewJob();
+                  setModelName("");
+                  setError("");
+                }}
+              >
+                <Plus size={16} />
+                Start New Job
+              </button>
+            )}
           </form>
         </div>
 
@@ -806,6 +739,64 @@ const ModelTraining = () => {
           )}
         </div>
       </div>
+
+      {/* ── Job History List ── */}
+      {jobHistory.length > 0 && (
+        <div className="job-history-section page-enter">
+          <div className="job-history-header">
+            <div className="job-history-title">
+              <Activity size={18} />
+              <span>Training Jobs</span>
+            </div>
+            <span className="job-history-count">{jobHistory.length} job{jobHistory.length !== 1 ? "s" : ""}</span>
+          </div>
+
+          <div className="job-history-list">
+            {jobHistory.map((job) => (
+              <div key={job.id} className={`job-history-item glass-panel ${job.status}`}>
+                <div className="job-history-item-top">
+                  <div className="job-history-item-left">
+                    <StatusBadge status={job.status} />
+                    <span className="job-history-id">Job #{job.id}</span>
+                    {job.result?.model_name && (
+                      <span className="job-history-model-name">{job.result.model_name}</span>
+                    )}
+                  </div>
+                  <div className="job-history-item-right">
+                    <span className="job-history-progress-text">{job.progress}%</span>
+                    <button
+                      type="button"
+                      className="job-history-dismiss"
+                      onClick={() => removeJobFromHistory(job.id)}
+                      title="Dismiss"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Progress bar */}
+                <div className="job-history-progress-track">
+                  <div
+                    className={`job-history-progress-fill ${job.status}`}
+                    style={{ width: `${job.progress}%` }}
+                  />
+                </div>
+
+                {/* Message */}
+                {job.message && (
+                  <p className="job-history-message">{job.message}</p>
+                )}
+
+                {/* Error */}
+                {job.error && (
+                  <p className="job-history-error">{job.error}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

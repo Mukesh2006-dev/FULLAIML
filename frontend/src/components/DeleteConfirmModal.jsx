@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   ShieldAlert,
 } from "lucide-react";
+import { createPortal } from "react-dom";
 
 const DeleteConfirmModal = ({
   isOpen,
@@ -22,7 +23,7 @@ const DeleteConfirmModal = ({
 
   const hasResult = deleteResult !== null;
 
-  return (
+  return createPortal(
     <div 
       className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#02040a]/80 backdrop-blur-sm animate-overlay-fade-in" 
       role="presentation" 
@@ -32,8 +33,6 @@ const DeleteConfirmModal = ({
         className="relative w-full max-w-[460px] m-4 p-0 rounded-xl border border-red-500/10 shadow-[0_24px_80px_rgba(0,0,0,0.7),_0_0_40px_rgba(239,68,68,0.06)] overflow-hidden bg-bg-card backdrop-blur-md animate-modal-slide-in sm:max-w-[95vw]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close button removed */}
-
         {/* Deleting in progress */}
         {isDeleting && (
           <div className="flex flex-col items-center text-center p-10 pb-8 sm:p-8 sm:pb-6">
@@ -157,7 +156,8 @@ const DeleteConfirmModal = ({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
