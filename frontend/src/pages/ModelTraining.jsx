@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   BrainCircuit,
@@ -108,6 +108,135 @@ const StepIndicators = ({ progress }) => (
     })}
   </div>
 );
+
+/* ── Memoized Confusion Matrix chart (prevents re-init on parent re-render) ── */
+const ConfusionMatrixChart = ({ trainResult }) => {
+  const option = useMemo(() => {
+    const cm = trainResult?.metrics?.confusion_matrix;
+    if (!cm) return null;
+    const labelCount = cm.labels.length;
+    return {
+      tooltip: {
+        formatter: (p) => `Actual: ${p.data[1]}<br/>Predicted: ${p.data[0]}<br/>Count: <strong>${p.data[2]}</strong>`
+      },
+      grid: { top: 40, right: 40, bottom: 60, left: 70 },
+      xAxis: {
+        type: "category",
+        data: cm.labels,
+        name: "Predicted",
+        nameLocation: "center",
+        nameGap: 35,
+        nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+        axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+        axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+        splitLine: { show: false }
+      },
+      yAxis: {
+        type: "category",
+        data: cm.labels,
+        name: "Actual",
+        nameLocation: "center",
+        nameGap: 50,
+        nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+        axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+        axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+        splitLine: { show: false }
+      },
+      visualMap: {
+        min: 0,
+        max: Math.max(...cm.heatmap_data.map(d => d.value)),
+        calculable: true,
+        orient: "vertical",
+        right: 0,
+        top: "center",
+        inRange: { color: ["#0a1628", "#00494f", "#00c8d4", "#00f0ff"] },
+        textStyle: { color: "#8892a8", fontSize: 10 },
+        show: false
+      },
+      series: [{
+        type: "heatmap",
+        data: cm.heatmap_data.map(d => [d.predicted, d.actual, d.value]),
+        label: {
+          show: true,
+          color: "#e8ecf4",
+          fontSize: labelCount > 20 ? 8 : labelCount > 10 ? 10 : 13,
+          fontWeight: 700,
+          formatter: (p) => p.data[2] === 0 ? "" : p.data[2]
+        },
+        emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,240,255,0.5)" } },
+        itemStyle: {
+          borderWidth: labelCount > 20 ? 1 : 2,
+          borderColor: "#0c1020"
+        }
+      }]
+    };
+  }, [trainResult]);
+
+  const labelCount = trainResult?.metrics?.confusion_matrix?.labels?.length || 0;
+  const chartHeight = labelCount > 20 ? Math.max(400, labelCount * 14) : 360;
+
+  if (!option) return null;
+  return <ReactECharts style={{ height: chartHeight }} option={option} notMerge />;
+};
+
+/* ── Memoized Actual vs Predicted chart ── */
+const ActualVsPredictedChart = ({ trainResult }) => {
+  const option = useMemo(() => {
+    const pts = trainResult?.metrics?.prediction_quality?.actual_vs_predicted;
+    if (!pts) return null;
+    const allVals = pts.flatMap(p => [p.actual, p.predicted]);
+    const minV = Math.min(...allVals);
+    const maxV = Math.max(...allVals);
+    const pad = (maxV - minV) * 0.08 || 1;
+    return {
+      tooltip: {
+        formatter: (p) => `Actual: ${p.data[0].toFixed(3)}<br/>Predicted: ${p.data[1].toFixed(3)}`
+      },
+      grid: { top: 30, right: 30, bottom: 50, left: 60 },
+      xAxis: {
+        name: "Actual",
+        nameLocation: "center",
+        nameGap: 32,
+        nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+        min: minV - pad,
+        max: maxV + pad,
+        axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+        axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+        splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } }
+      },
+      yAxis: {
+        name: "Predicted",
+        nameLocation: "center",
+        nameGap: 42,
+        nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
+        min: minV - pad,
+        max: maxV + pad,
+        axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
+        axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
+        splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } }
+      },
+      series: [
+        {
+          type: "scatter",
+          data: pts.map(p => [p.actual, p.predicted]),
+          symbolSize: 8,
+          itemStyle: { color: "#00f0ff", opacity: 0.8 },
+          emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,240,255,0.6)" } }
+        },
+        {
+          type: "line",
+          data: [[minV - pad, minV - pad], [maxV + pad, maxV + pad]],
+          lineStyle: { color: "rgba(167,139,250,0.5)", type: "dashed", width: 2 },
+          symbol: "none",
+          tooltip: { show: false }
+        }
+      ]
+    };
+  }, [trainResult]);
+
+  if (!option) return null;
+  return <ReactECharts style={{ height: 360 }} option={option} notMerge />;
+};
 
 const ModelTraining = () => {
   const [searchParams] = useSearchParams();
@@ -469,22 +598,6 @@ const ModelTraining = () => {
                 "Start Model Training"
               )}
             </button>
-
-            {/* Start New Job button — shown when training or results are visible */}
-            {(training || trainResult) && (
-              <button
-                type="button"
-                className="new-job-btn clickable"
-                onClick={() => {
-                  startNewJob();
-                  setModelName("");
-                  setError("");
-                }}
-              >
-                <Plus size={16} />
-                Start New Job
-              </button>
-            )}
           </form>
         </div>
 
@@ -542,55 +655,7 @@ const ModelTraining = () => {
                         <BarChart3 size={16} />
                         <span>Confusion Matrix</span>
                       </div>
-                      <ReactECharts
-                        style={{ height: 360 }}
-                        option={{
-                          tooltip: {
-                            formatter: (p) => `Actual: ${p.data[1]}<br/>Predicted: ${p.data[0]}<br/>Count: <strong>${p.data[2]}</strong>`
-                          },
-                          grid: { top: 40, right: 40, bottom: 60, left: 70 },
-                          xAxis: {
-                            type: "category",
-                            data: trainResult.metrics.confusion_matrix.labels,
-                            name: "Predicted",
-                            nameLocation: "center",
-                            nameGap: 35,
-                            nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
-                            axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
-                            axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
-                            splitLine: { show: false }
-                          },
-                          yAxis: {
-                            type: "category",
-                            data: trainResult.metrics.confusion_matrix.labels,
-                            name: "Actual",
-                            nameLocation: "center",
-                            nameGap: 50,
-                            nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
-                            axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
-                            axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
-                            splitLine: { show: false }
-                          },
-                          visualMap: {
-                            min: 0,
-                            max: Math.max(...trainResult.metrics.confusion_matrix.heatmap_data.map(d => d.value)),
-                            calculable: true,
-                            orient: "vertical",
-                            right: 0,
-                            top: "center",
-                            inRange: { color: ["#0a1628", "#00494f", "#00c8d4", "#00f0ff"] },
-                            textStyle: { color: "#8892a8", fontSize: 10 },
-                            show: false
-                          },
-                          series: [{
-                            type: "heatmap",
-                            data: trainResult.metrics.confusion_matrix.heatmap_data.map(d => [d.predicted, d.actual, d.value]),
-                            label: { show: true, color: "#e8ecf4", fontSize: 13, fontWeight: 700 },
-                            emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,240,255,0.5)" } },
-                            itemStyle: { borderWidth: 2, borderColor: "#0c1020" }
-                          }]
-                        }}
-                      />
+                      <ConfusionMatrixChart trainResult={trainResult} />
                     </div>
                   )}
                 </>
@@ -618,60 +683,7 @@ const ModelTraining = () => {
                         <ScatterChart size={16} />
                         <span>Actual vs Predicted</span>
                       </div>
-                      <ReactECharts
-                        style={{ height: 360 }}
-                        option={(() => {
-                          const pts = trainResult.metrics.prediction_quality.actual_vs_predicted;
-                          const allVals = pts.flatMap(p => [p.actual, p.predicted]);
-                          const minV = Math.min(...allVals);
-                          const maxV = Math.max(...allVals);
-                          const pad = (maxV - minV) * 0.08 || 1;
-                          return {
-                            tooltip: {
-                              formatter: (p) => `Actual: ${p.data[0].toFixed(3)}<br/>Predicted: ${p.data[1].toFixed(3)}`
-                            },
-                            grid: { top: 30, right: 30, bottom: 50, left: 60 },
-                            xAxis: {
-                              name: "Actual",
-                              nameLocation: "center",
-                              nameGap: 32,
-                              nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
-                              min: minV - pad,
-                              max: maxV + pad,
-                              axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
-                              axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
-                              splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } }
-                            },
-                            yAxis: {
-                              name: "Predicted",
-                              nameLocation: "center",
-                              nameGap: 42,
-                              nameTextStyle: { color: "#8892a8", fontSize: 12, fontFamily: "JetBrains Mono" },
-                              min: minV - pad,
-                              max: maxV + pad,
-                              axisLabel: { color: "#8892a8", fontSize: 10, fontFamily: "JetBrains Mono" },
-                              axisLine: { lineStyle: { color: "rgba(255,255,255,0.09)" } },
-                              splitLine: { lineStyle: { color: "rgba(255,255,255,0.04)" } }
-                            },
-                            series: [
-                              {
-                                type: "scatter",
-                                data: pts.map(p => [p.actual, p.predicted]),
-                                symbolSize: 8,
-                                itemStyle: { color: "#00f0ff", opacity: 0.8 },
-                                emphasis: { itemStyle: { shadowBlur: 10, shadowColor: "rgba(0,240,255,0.6)" } }
-                              },
-                              {
-                                type: "line",
-                                data: [[minV - pad, minV - pad], [maxV + pad, maxV + pad]],
-                                lineStyle: { color: "rgba(167,139,250,0.5)", type: "dashed", width: 2 },
-                                symbol: "none",
-                                tooltip: { show: false }
-                              }
-                            ]
-                          };
-                        })()}
-                      />
+                      <ActualVsPredictedChart trainResult={trainResult} />
                     </div>
                   )}
                 </>
@@ -737,66 +749,82 @@ const ModelTraining = () => {
               <p>Configure model target and algorithm parameters on the left card and click "Start" to launch the training process.</p>
             </div>
           )}
-        </div>
-      </div>
 
-      {/* ── Job History List ── */}
-      {jobHistory.length > 0 && (
-        <div className="job-history-section page-enter">
-          <div className="job-history-header">
-            <div className="job-history-title">
-              <Activity size={18} />
-              <span>Training Jobs</span>
-            </div>
-            <span className="job-history-count">{jobHistory.length} job{jobHistory.length !== 1 ? "s" : ""}</span>
-          </div>
+          {/* Start New Job button — shown when training or results are visible */}
+          {(training || trainResult) && (
+            <button
+              type="button"
+              className="new-job-btn clickable"
+              onClick={() => {
+                startNewJob();
+                setModelName("");
+                setError("");
+              }}
+            >
+              <Plus size={16} />
+              Start New Job
+            </button>
+          )}
 
-          <div className="job-history-list">
-            {jobHistory.map((job) => (
-              <div key={job.id} className={`job-history-item glass-panel ${job.status}`}>
-                <div className="job-history-item-top">
-                  <div className="job-history-item-left">
-                    <StatusBadge status={job.status} />
-                    <span className="job-history-id">Job #{job.id}</span>
-                    {job.result?.model_name && (
-                      <span className="job-history-model-name">{job.result.model_name}</span>
+          {/* ── Job History List ── */}
+          {jobHistory.length > 0 && (
+            <div className="job-history-section page-enter">
+              <div className="job-history-header">
+                <div className="job-history-title">
+                  <Activity size={18} />
+                  <span>Training Jobs</span>
+                </div>
+                <span className="job-history-count">{jobHistory.length} job{jobHistory.length !== 1 ? "s" : ""}</span>
+              </div>
+
+              <div className="job-history-list">
+                {jobHistory.map((job) => (
+                  <div key={job.id} className={`job-history-item glass-panel ${job.status}`}>
+                    <div className="job-history-item-top">
+                      <div className="job-history-item-left">
+                        <StatusBadge status={job.status} />
+                        <span className="job-history-id">Job #{job.id}</span>
+                        {job.result?.model_name && (
+                          <span className="job-history-model-name">{job.result.model_name}</span>
+                        )}
+                      </div>
+                      <div className="job-history-item-right">
+                        <span className="job-history-progress-text">{job.progress}%</span>
+                        <button
+                          type="button"
+                          className="job-history-dismiss"
+                          onClick={() => removeJobFromHistory(job.id)}
+                          title="Dismiss"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="job-history-progress-track">
+                      <div
+                        className={`job-history-progress-fill ${job.status}`}
+                        style={{ width: `${job.progress}%` }}
+                      />
+                    </div>
+
+                    {/* Message */}
+                    {job.message && (
+                      <p className="job-history-message">{job.message}</p>
+                    )}
+
+                    {/* Error */}
+                    {job.error && (
+                      <p className="job-history-error">{job.error}</p>
                     )}
                   </div>
-                  <div className="job-history-item-right">
-                    <span className="job-history-progress-text">{job.progress}%</span>
-                    <button
-                      type="button"
-                      className="job-history-dismiss"
-                      onClick={() => removeJobFromHistory(job.id)}
-                      title="Dismiss"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Progress bar */}
-                <div className="job-history-progress-track">
-                  <div
-                    className={`job-history-progress-fill ${job.status}`}
-                    style={{ width: `${job.progress}%` }}
-                  />
-                </div>
-
-                {/* Message */}
-                {job.message && (
-                  <p className="job-history-message">{job.message}</p>
-                )}
-
-                {/* Error */}
-                {job.error && (
-                  <p className="job-history-error">{job.error}</p>
-                )}
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };
