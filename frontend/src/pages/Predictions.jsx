@@ -392,10 +392,13 @@ const Predictions = () => {
             <div className="form-group">
               <label>Trained Model</label>
               {loadingModels ? (
-                <div className="loading-dropdown">
-                  <Loader2 className="animate-spin" size={14} />
-                  <span>Loading models…</span>
-                </div>
+                <>
+                  <div className="skeleton skeleton-select" />
+                  <div className="skeleton skeleton-badge" style={{ marginTop: '0.75rem' }} />
+                  <div className="skeleton-metrics-grid">
+                    {[1,2,3,4].map(i => <div key={i} className="skeleton skeleton-metric" />)}
+                  </div>
+                </>
               ) : (
                 <select
                   value={modelId}
@@ -483,8 +486,17 @@ const Predictions = () => {
               {activeTab === 'single' && (
                 <div>
                   {loadingSchema ? (
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-                      <Loader2 className="animate-spin text-accent-cyan" size={32} />
+                    <div>
+                      <div className="skeleton skeleton-toggle" />
+                      <div className="skeleton-form-grid">
+                        {[1,2,3,4,5,6].map(i => (
+                          <div className="skeleton-field" key={i}>
+                            <div className="skeleton skeleton-label" />
+                            <div className="skeleton skeleton-input" />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="skeleton skeleton-button" />
                     </div>
                   ) : (
                     <div>
@@ -746,8 +758,18 @@ const Predictions = () => {
                   <h3 style={{ marginBottom: '1rem', fontSize: '1rem' }}>Prediction History</h3>
 
                   {loading ? (
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
-                      <Loader2 className="animate-spin text-accent-cyan" size={32} />
+                    <div className="skeleton-history-list">
+                      {[1,2,3].map(i => (
+                        <div className="skeleton-history-card" key={i}>
+                          <div className="skeleton-history-meta">
+                            <div className="skeleton skeleton-history-meta-left" />
+                            <div className="skeleton skeleton-history-meta-right" />
+                          </div>
+                          <div className="skeleton skeleton-history-block" />
+                          <div className="skeleton skeleton-history-block-sm" />
+                          <div className="skeleton skeleton-history-bar" />
+                        </div>
+                      ))}
                     </div>
                   ) : history.length === 0 ? (
                     <p style={{ color: 'var(--text-muted)', fontStyle: 'italic' }}>No history found for this model.</p>

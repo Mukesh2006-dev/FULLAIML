@@ -3,12 +3,13 @@
    ═══════════════════════════════════════════════════════ */
 
 .login-container {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
   background-color: var(--bg-body);
   background-image:
     radial-gradient(ellipse 80% 60% at 10% 20%, rgba(0, 240, 255, 0.04) 0%, transparent 60%),
@@ -44,8 +45,13 @@
 }
 
 @keyframes floatGlow {
-  0% { transform: translate(0, 0) scale(1); }
-  100% { transform: translate(20px, -15px) scale(1.05); }
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate(20px, -15px) scale(1.05);
+  }
 }
 
 /* ── Card ── */
@@ -231,13 +237,11 @@
 .login-divider-line {
   flex: 1;
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.08) 30%,
-    rgba(255, 255, 255, 0.08) 70%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.08) 30%,
+      rgba(255, 255, 255, 0.08) 70%,
+      transparent 100%);
 }
 
 .login-divider-text {
@@ -300,7 +304,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ── Footer ── */

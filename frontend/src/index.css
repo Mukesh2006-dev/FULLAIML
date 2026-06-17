@@ -158,6 +158,11 @@
 }
 
 @layer base {
+  html, body {
+    overflow-y: auto !important;
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-bg-body text-text-primary font-body antialiased;
     background-image:

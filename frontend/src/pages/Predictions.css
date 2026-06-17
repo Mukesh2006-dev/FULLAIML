@@ -880,3 +880,186 @@
 .animate-fade-in-up {
   animation: fadeInUp 0.4s var(--ease-out) both;
 }
+
+/* ══════════════════════════════════════════════════════════
+   Skeleton Loading
+   ══════════════════════════════════════════════════════════ */
+@keyframes skeletonShimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 25%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 75%
+  );
+  background-size: 800px 100%;
+  animation: skeletonShimmer 1.6s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Form field skeletons ── */
+.skeleton-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.skeleton-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.skeleton-label {
+  height: 12px;
+  width: 65%;
+  border-radius: 3px;
+}
+
+.skeleton-input {
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── Toggle skeleton ── */
+.skeleton-toggle {
+  height: 32px;
+  width: 140px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+}
+
+/* ── Model selector skeleton ── */
+.skeleton-select {
+  height: 42px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.skeleton-badge {
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.skeleton-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.skeleton-metric {
+  height: 52px;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── History card skeletons ── */
+.skeleton-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-history-card {
+  padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.skeleton-history-meta {
+  display: flex;
+  justify-content: space-between;
+}
+
+.skeleton-history-meta-left {
+  height: 12px;
+  width: 60px;
+  border-radius: 3px;
+}
+
+.skeleton-history-meta-right {
+  height: 12px;
+  width: 120px;
+  border-radius: 3px;
+}
+
+.skeleton-history-block {
+  height: 48px;
+  border-radius: 4px;
+}
+
+.skeleton-history-block-sm {
+  height: 36px;
+  border-radius: 4px;
+}
+
+.skeleton-history-bar {
+  height: 10px;
+  width: 100px;
+  border-radius: 3px;
+}
+
+/* ── Batch table skeleton ── */
+.skeleton-table {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.skeleton-table-header {
+  display: grid;
+  grid-template-columns: 50px 1fr 1fr;
+  gap: 0;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border-default);
+}
+
+.skeleton-table-header-cell {
+  height: 12px;
+  width: 60%;
+  border-radius: 3px;
+}
+
+.skeleton-table-row {
+  display: grid;
+  grid-template-columns: 50px 1fr 1fr;
+  gap: 0;
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.skeleton-table-cell {
+  height: 14px;
+  border-radius: 3px;
+}
+
+.skeleton-table-cell-sm {
+  width: 30px;
+}
+
+.skeleton-table-cell-md {
+  width: 70%;
+}
+
+.skeleton-table-cell-lg {
+  width: 55%;
+}
+
+/* ── Button skeleton ── */
+.skeleton-button {
+  height: 42px;
+  width: 160px;
+  border-radius: var(--radius-sm);
+  margin-top: 1rem;
+}
