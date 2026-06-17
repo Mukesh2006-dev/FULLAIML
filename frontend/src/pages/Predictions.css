@@ -1,3 +1,7 @@
+/* ══════════════════════════════════════════════════════════
+   Predictions Page — Enhanced UI
+   ══════════════════════════════════════════════════════════ */
+
 .predictions-container {
   width: 100%;
   max-width: 1200px;
@@ -56,6 +60,7 @@
   }
 }
 
+/* ── Tabs ── */
 .predictions-container .tabs-header {
   display: flex;
   gap: 0.5rem;
@@ -87,6 +92,7 @@
   font-weight: 600;
 }
 
+/* ── JSON Editor ── */
 .predictions-container .json-editor {
   width: 100%;
   min-height: 200px;
@@ -106,12 +112,14 @@
   box-shadow: 0 0 0 2px rgba(var(--accent-primary-rgb), 0.2);
 }
 
+/* ── Result Box ── */
 .predictions-container .result-box {
   margin-top: 1.5rem;
   padding: 1.5rem;
   border-radius: var(--radius-md);
   background: var(--bg-card);
   border: 1px solid var(--border-success);
+  animation: resultCardIn 0.4s var(--ease-out) both;
 }
 
 .predictions-container .result-box.error {
@@ -127,6 +135,7 @@
   margin-top: 0.5rem;
 }
 
+/* ── History ── */
 .predictions-container .history-list {
   display: flex;
   flex-direction: column;
@@ -138,6 +147,11 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-sm);
   padding: 1rem;
+  transition: border-color var(--transition-fast);
+}
+
+.predictions-container .history-item:hover {
+  border-color: var(--border-focus);
 }
 
 .predictions-container .history-meta {
@@ -149,6 +163,7 @@
   font-family: var(--font-mono);
 }
 
+/* ── Generate Button (scoped) ── */
 .predictions-container .generate-btn {
   padding: 0.75rem;
   background: var(--gradient-btn-primary);
@@ -298,4 +313,570 @@
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: 0.85rem;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Input Mode Toggle (Form / JSON)
+   ══════════════════════════════════════════════════════════ */
+.input-mode-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  background: var(--bg-input);
+  padding: 0.2rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  width: fit-content;
+}
+
+.input-mode-toggle .mode-btn {
+  padding: 0.4rem 0.85rem;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: calc(var(--radius-sm) - 2px);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.input-mode-toggle .mode-btn:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.input-mode-toggle .mode-btn.active {
+  background: var(--bg-active);
+  color: var(--accent-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Dynamic Form Fields
+   ══════════════════════════════════════════════════════════ */
+.dynamic-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.dynamic-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.dynamic-field label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dynamic-field label .field-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 0.6rem;
+  border-radius: 50%;
+  background: rgba(var(--accent-primary-rgb), 0.12);
+  color: var(--accent-primary);
+  flex-shrink: 0;
+}
+
+.dynamic-field input {
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.dynamic-field input:focus {
+  border-color: var(--border-focus);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.08);
+  background: rgba(12, 16, 32, 0.9);
+}
+
+.dynamic-field input::placeholder {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+/* Validation error state */
+.dynamic-field.has-error input {
+  border-color: var(--border-danger);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.12);
+}
+
+.dynamic-field .field-error {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-danger);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  animation: fadeInUp 0.2s var(--ease-out) both;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Best Model Badge
+   ══════════════════════════════════════════════════════════ */
+.best-model-star {
+  color: #fbbf24;
+  font-size: 0.85rem;
+  margin-right: 0.2rem;
+}
+
+.model-select-wrapper {
+  position: relative;
+}
+
+.best-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.5rem;
+  background: rgba(251, 191, 36, 0.1);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #fbbf24;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-left: 0.5rem;
+  animation: fadeInUp 0.3s var(--ease-out) both;
+}
+
+.best-badge svg {
+  width: 10px;
+  height: 10px;
+}
+
+.model-info-badge .best-badge {
+  margin-left: auto;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Confidence Gauge
+   ══════════════════════════════════════════════════════════ */
+.confidence-gauge {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-subtle);
+}
+
+.confidence-gauge-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.confidence-gauge-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+}
+
+.confidence-gauge-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.confidence-gauge-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s var(--ease-out);
+  position: relative;
+}
+
+.confidence-gauge-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 12px;
+  height: 100%;
+  background: inherit;
+  filter: brightness(1.4);
+  border-radius: 0 4px 4px 0;
+}
+
+.confidence-high { background: linear-gradient(90deg, #10b981, #34d399); }
+.confidence-medium { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.confidence-low { background: linear-gradient(90deg, #ef4444, #f87171); }
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Batch Results Table
+   ══════════════════════════════════════════════════════════ */
+.batch-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.batch-results-header .batch-count {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-success);
+}
+
+.download-csv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3) !important;
+  border-radius: var(--radius-sm);
+  color: var(--text-success);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.download-csv-btn:hover {
+  background: rgba(16, 185, 129, 0.2) !important;
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.15) !important;
+  transform: translateY(-1px);
+}
+
+.batch-table-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+}
+
+.batch-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.batch-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.batch-table th {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.6rem 1rem;
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-default);
+  font-weight: 600;
+}
+
+.batch-table td {
+  padding: 0.55rem 1rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.batch-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-primary);
+}
+
+.batch-table .prediction-cell {
+  color: var(--accent-primary);
+  font-weight: 600;
+}
+
+.batch-table .confidence-cell {
+  font-weight: 500;
+}
+
+.batch-table .confidence-cell.high { color: var(--text-success); }
+.batch-table .confidence-cell.medium { color: var(--text-warning); }
+.batch-table .confidence-cell.low { color: var(--text-danger); }
+
+.batch-table .row-num {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.batch-show-more {
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.batch-show-more button {
+  padding: 0.4rem 1rem;
+  background: transparent;
+  border: 1px solid var(--border-default) !important;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.batch-show-more button:hover {
+  border-color: var(--border-focus) !important;
+  color: var(--accent-primary);
+  background: var(--bg-hover) !important;
+}
+
+/* ── Inline mini confidence bar for batch table ── */
+.mini-confidence-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.mini-bar-track {
+  flex: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+  overflow: hidden;
+  min-width: 40px;
+  max-width: 80px;
+}
+
+.mini-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s var(--ease-out);
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Error Alert (inline)
+   ══════════════════════════════════════════════════════════ */
+.prediction-error-alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid var(--border-danger);
+  border-radius: var(--radius-sm);
+  color: var(--text-danger);
+  font-size: 0.82rem;
+  font-family: var(--font-mono);
+  animation: fadeInUp 0.25s var(--ease-out) both;
+}
+
+.prediction-error-alert svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Batch CSV Validation Summary
+   ══════════════════════════════════════════════════════════ */
+.csv-validation-summary {
+  margin-top: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: rgba(251, 191, 36, 0.06);
+  border: 1px solid rgba(251, 191, 36, 0.2);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-warning);
+  animation: fadeInUp 0.25s var(--ease-out) both;
+}
+
+.csv-validation-summary strong {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.csv-validation-summary ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.csv-validation-summary li {
+  padding-left: 1rem;
+  position: relative;
+}
+
+.csv-validation-summary li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--text-warning);
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: Model Metrics Mini Display (on setup card)
+   ══════════════════════════════════════════════════════════ */
+.model-metrics-mini {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  animation: fadeInUp 0.3s var(--ease-out) both;
+}
+
+.metric-mini {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.45rem 0.6rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+}
+
+.metric-mini-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-mini-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-cyan);
+}
+
+/* ══════════════════════════════════════════════════════════
+   NEW: File Upload Area
+   ══════════════════════════════════════════════════════════ */
+.file-upload-area {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem;
+  border: 2px dashed var(--border-default);
+  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  text-align: center;
+}
+
+.file-upload-area:hover {
+  border-color: var(--border-focus);
+  background: rgba(0, 240, 255, 0.02);
+}
+
+.file-upload-area.has-file {
+  border-color: var(--border-success);
+  background: rgba(16, 185, 129, 0.03);
+}
+
+.file-upload-area input[type="file"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-upload-icon {
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+
+.file-upload-area:hover .file-upload-icon {
+  color: var(--accent-primary);
+}
+
+.file-upload-area.has-file .file-upload-icon {
+  color: var(--text-success);
+}
+
+.file-upload-text {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.file-upload-text strong {
+  color: var(--accent-primary);
+}
+
+.file-name-display {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-success);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* ══════════════════════════════════════════════════════════
+   Animations
+   ══════════════════════════════════════════════════════════ */
+@keyframes resultCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gaugeGrow {
+  from { width: 0%; }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s var(--ease-out) both;
 }
