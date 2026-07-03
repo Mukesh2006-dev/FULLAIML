@@ -2,7 +2,7 @@ import { Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Layout from "./components/Layout";
-import ScrollToTop from "./components/ScrollToTop";
+import { Cursor } from "./components/Cursor";
 import { lazyWithPreload } from "./utils/lazyWithPreload";
 import "./App.css";
 
@@ -62,9 +62,10 @@ function App() {
   }, []);
 
   return (
+    <>
+    <Cursor />
     <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <Router>
-        <ScrollToTop />
         <Suspense fallback={<GlobalLoader />}>
           <Routes>
             <Route path="/login" element={<Login />} />
@@ -88,6 +89,7 @@ function App() {
         </Suspense>
       </Router>
     </GoogleOAuthProvider>
+    </>
   );
 }
 
