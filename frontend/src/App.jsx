@@ -2,6 +2,7 @@ import { Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Layout from "./components/Layout";
+import ErrorBoundary from "./components/ErrorBoundary";
 import { Cursor } from "./components/Cursor";
 import { lazyWithPreload } from "./utils/lazyWithPreload";
 import "./App.css";
@@ -29,9 +30,11 @@ const ProtectedRoute = () => {
   }
   return (
     <Layout>
-      <Suspense fallback={<SkeletonLoader />}>
-        <Outlet />
-      </Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<SkeletonLoader />}>
+          <Outlet />
+        </Suspense>
+      </ErrorBoundary>
     </Layout>
   );
 };

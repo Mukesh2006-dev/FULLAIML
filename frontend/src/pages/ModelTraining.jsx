@@ -1,25 +1,24 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-  BrainCircuit,
+  Brain,
   ArrowLeft,
-  Loader2,
-  Sliders,
+  CircleNotch,
+  SlidersHorizontal,
   CheckCircle,
   Trophy,
-  Activity,
-  Award,
-  BarChart3,
-  ScatterChart,
-  Scale,
+  Pulse,
   ListChecks,
   Circle,
   XCircle,
   Clock,
-  Zap,
+  Lightning,
   Plus,
   X,
-} from "lucide-react";
+  ChartBar,
+  TrendUp,
+  Scales,
+} from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import ReactECharts from "echarts-for-react";
 import API from "../utils/api";
@@ -63,10 +62,10 @@ const ProgressRing = ({ progress }) => {
 /* ── Status badge component ── */
 const StatusBadge = ({ status }) => {
   const icons = {
-    pending: <Clock size={12} />,
-    running: <Zap size={12} />,
-    completed: <CheckCircle size={12} />,
-    failed: <XCircle size={12} />,
+    pending: <Clock size={12} weight="duotone" />,
+    running: <Lightning size={12} weight="fill" />,
+    completed: <CheckCircle size={12} weight="duotone" />,
+    failed: <XCircle size={12} weight="duotone" />,
   };
 
   return (
@@ -96,9 +95,9 @@ const StepIndicators = ({ progress }) => (
           className={`job-step-item ${isDone ? "done" : ""} ${isActive ? "active" : ""}`}
         >
           {isDone ? (
-            <CheckCircle size={13} />
+            <CheckCircle size={13} weight="duotone" />
           ) : isActive ? (
-            <Loader2 size={13} className="animate-spin" />
+            <CircleNotch size={13} className="animate-spin" />
           ) : (
             <Circle size={13} />
           )}
@@ -398,7 +397,7 @@ const ModelTraining = () => {
               <label htmlFor="ml-dataset">Dataset Source</label>
               {loadingDatasets ? (
                 <div className="loading-dropdown">
-                  <Loader2 className="animate-spin" size={14} />
+                  <CircleNotch className="animate-spin" size={14} />
                   <span>Loading datasets…</span>
                 </div>
               ) : (
@@ -472,7 +471,7 @@ const ModelTraining = () => {
 
             {loadingColumns ? (
               <div className="loading-columns">
-                <Loader2 className="animate-spin" size={16} />
+                <CircleNotch className="animate-spin" size={16} />
                 <span>Reading columns from dataset…</span>
               </div>
             ) : (
@@ -519,7 +518,7 @@ const ModelTraining = () => {
             {/* Hyperparameter Accordion */}
             <div className="hyperparameters-section">
               <div className="hyper-header">
-                <Sliders size={16} />
+                <SlidersHorizontal size={16} weight="duotone" />
                 <span>Hyperparameters & Parameters</span>
               </div>
 
@@ -591,7 +590,7 @@ const ModelTraining = () => {
             >
               {training ? (
                 <>
-                  <Loader2 className="animate-spin" size={18} />
+                  <CircleNotch className="animate-spin" size={18} />
                   Training in Progress…
                 </>
               ) : (
@@ -623,7 +622,7 @@ const ModelTraining = () => {
 
               {/* Performance Metrics Cards */}
               <div className="performance-metrics-title">
-                <Activity size={16} />
+                <Pulse size={16} weight="duotone" />
                 <span>Validation Performance</span>
               </div>
 
@@ -652,7 +651,7 @@ const ModelTraining = () => {
                   {trainResult.metrics.confusion_matrix && (
                     <div className="chart-section glass-panel">
                       <div className="chart-section-header">
-                        <BarChart3 size={16} />
+                        <ChartBar size={16} weight="duotone" />
                         <span>Confusion Matrix</span>
                       </div>
                       <ConfusionMatrixChart trainResult={trainResult} />
@@ -680,7 +679,7 @@ const ModelTraining = () => {
                   {trainResult.metrics.prediction_quality?.actual_vs_predicted && (
                     <div className="chart-section glass-panel">
                       <div className="chart-section-header">
-                        <ScatterChart size={16} />
+                        <TrendUp size={16} weight="duotone" />
                         <span>Actual vs Predicted</span>
                       </div>
                       <ActualVsPredictedChart trainResult={trainResult} />
@@ -692,7 +691,7 @@ const ModelTraining = () => {
               {/* Model attributes */}
               <div className="model-report-details">
                 <div className="model-report-header">
-                  <Award size={16} />
+                  <Trophy size={16} weight="duotone" />
                   <span>Model Metadata</span>
                 </div>
 
@@ -731,7 +730,7 @@ const ModelTraining = () => {
                     style={{ width: '100%', background: 'var(--bg-inset)', border: '1px solid var(--border-focus)' }}
                     onClick={() => navigate(`/ml-comparison?dataset_id=${selectedDatasetId}&problem_type=${problemType}`)}
                   >
-                    <Scale size={18} />
+                    <Scales size={18} weight="duotone" />
                     Compare with Previous Models
                   </button>
                 </div>
@@ -740,10 +739,10 @@ const ModelTraining = () => {
           ) : (
             <div className="training-idle-state">
               <motion.div
-                animate={{ scale: [1, 1.05, 1], opacity: [0.5, 1, 0.5] }}
+                animate={{ scale: [1, 1.05, 1], opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               >
-                <BrainCircuit size={56} className="idle-brain-icon" />
+                <Brain size={56} weight="duotone" className="idle-brain-icon text-accent-cyan drop-shadow-[0_0_16px_rgba(0,240,255,0.4)]" />
               </motion.div>
               <h3>Training Ready</h3>
               <p>Configure model target and algorithm parameters on the left card and click "Start" to launch the training process.</p>
@@ -771,7 +770,7 @@ const ModelTraining = () => {
             <div className="job-history-section page-enter">
               <div className="job-history-header">
                 <div className="job-history-title">
-                  <Activity size={18} />
+                  <Pulse size={18} weight="duotone" />
                   <span>Training Jobs</span>
                 </div>
                 <span className="job-history-count">{jobHistory.length} job{jobHistory.length !== 1 ? "s" : ""}</span>

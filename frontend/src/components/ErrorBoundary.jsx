@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle } from 'lucide-react';
+import { WarningCircle } from '@phosphor-icons/react';
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
       }
       return (
         <div className="w-full h-full min-h-[400px] flex flex-col items-center justify-center p-8 text-center">
-          <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+          <WarningCircle className="w-16 h-16 text-red-500 mb-4" weight="duotone" />
           <h2 className="text-2xl font-bold mb-2">Something went wrong</h2>
           <p className="text-gray-400 mb-6">
             We encountered an unexpected error rendering this component.

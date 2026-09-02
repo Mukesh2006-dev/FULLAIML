@@ -2,12 +2,11 @@ import { useState, useEffect, lazy, Suspense } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
-  Loader2,
-  Image,
-  RefreshCw,
+  CircleNotch,
+  ChartLineUp,
   SlidersHorizontal,
-  TrendingUp
-} from "lucide-react";
+  TrendUp,
+} from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import API from "../utils/api";
 import { useToast } from "../components/useToast";
@@ -517,7 +516,7 @@ const Visualizations = () => {
               <label htmlFor="vis-dataset">Dataset Source</label>
               {loadingDatasets ? (
                 <div className="loading-dropdown">
-                  <Loader2 className="animate-spin" size={14} />
+                  <CircleNotch className="animate-spin" size={14} />
                   <span>Loading datasets…</span>
                 </div>
               ) : (
@@ -566,7 +565,7 @@ const Visualizations = () => {
 
             {loadingColumns ? (
               <div className="loading-columns">
-                <Loader2 className="animate-spin" size={18} />
+                <CircleNotch className="animate-spin" size={18} />
                 <span>Reading columns from dataset…</span>
               </div>
             ) : (
@@ -636,7 +635,7 @@ const Visualizations = () => {
                   {/* Heatmap options */}
                   {plotType === "heatmap" && (
                     <div className="heatmap-info-note">
-                      <SlidersHorizontal size={16} />
+                      <SlidersHorizontal size={16} weight="duotone" />
                       <span>Heatmaps compute correlations across all numeric variables in parallel. No parameter settings required.</span>
                     </div>
                   )}
@@ -651,7 +650,7 @@ const Visualizations = () => {
             >
               {loadingChart ? (
                 <>
-                  <Loader2 className="animate-spin" size={18} />
+                  <CircleNotch className="animate-spin" size={18} />
                   Plotting…
                 </>
               ) : (
@@ -668,7 +667,7 @@ const Visualizations = () => {
 
           {loadingChart ? (
             <div className="rendering-placeholder">
-              <RefreshCw className="animate-spin render-spin-ico" size={40} />
+              <CircleNotch className="animate-spin render-spin-ico" size={40} />
               <h3>Compiling Data Graphics…</h3>
               <p>Aggregating records and building interactive chart.</p>
             </div>
@@ -677,7 +676,7 @@ const Visualizations = () => {
               <div className="chart-wrapper">
                 <Suspense fallback={
                   <div className="rendering-placeholder" style={{ height: '550px' }}>
-                    <Loader2 className="animate-spin render-spin-ico" size={40} />
+                    <CircleNotch className="animate-spin render-spin-ico" size={40} />
                     <h3>Loading Chart Engine…</h3>
                   </div>
                 }>
@@ -687,7 +686,7 @@ const Visualizations = () => {
 
               <div className="chart-metadata">
                 <div className="meta-headline">
-                  <TrendingUp size={16} className="trend-ico" />
+                  <TrendUp size={16} weight="duotone" className="trend-ico" />
                   <h4>Chart Attributes & Insights</h4>
                 </div>
 
@@ -772,10 +771,10 @@ const Visualizations = () => {
           ) : (
             <div className="idle-display">
               <motion.div
-                animate={{ scale: [1, 1.05, 1], opacity: [0.5, 1, 0.5] }}
+                animate={{ scale: [1, 1.05, 1], opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               >
-                <Image size={56} className="idle-img-icon" />
+                <ChartLineUp size={64} weight="duotone" className="idle-img-icon text-accent-cyan drop-shadow-[0_0_16px_rgba(0,240,255,0.4)]" />
               </motion.div>
               <h3>No Active Chart</h3>
               <p>Configure your visualization and click "Render" on the left panel to output charts.</p>

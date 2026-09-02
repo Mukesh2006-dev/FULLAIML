@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-  Sparkles,
+  Sparkle,
   ArrowLeft,
-  Loader2,
-
+  CircleNotch,
   CheckCircle,
-  FileSpreadsheet,
-
+  FileCsv,
   Info
-} from "lucide-react";
+} from "@phosphor-icons/react";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./Preprocessing.css";
@@ -102,7 +100,7 @@ const Preprocessing = () => {
           <div className="dataset-picker-group">
             {loadingDatasets ? (
               <div className="loading-dropdown">
-                <Loader2 className="animate-spin" size={16} />
+                <CircleNotch className="animate-spin" size={16} />
                 <span>Loading datasets…</span>
               </div>
             ) : (
@@ -165,7 +163,7 @@ const Preprocessing = () => {
                   onClick={() => handleCleanAction("auto-clean")}
                   disabled={processing || !selectedDatasetId}
                 >
-                  <Sparkles size={14} /> Run Auto
+                  <Sparkle size={14} weight="duotone" /> Run Auto
                 </button>
               </div>
             </div>
@@ -179,14 +177,14 @@ const Preprocessing = () => {
 
           {processing ? (
             <div className="pipeline-running">
-              <Loader2 className="animate-spin processing-ico" size={40} />
+              <CircleNotch className="animate-spin processing-ico" size={40} />
               <h3>Cleaning Pipeline Executing…</h3>
               <p>Analyzing rows, dropping anomalies, and saving cleaned dataset output.</p>
             </div>
           ) : result ? (
             <div className="pipeline-report-container page-enter">
               <div className="report-success-header">
-                <CheckCircle size={24} className="success-ico" />
+                <CheckCircle size={24} weight="duotone" className="success-ico" />
                 <span>{result.message}</span>
               </div>
 
@@ -232,13 +230,13 @@ const Preprocessing = () => {
               </div>
 
               <div className="info-notice">
-                <Info size={16} />
+                <Info size={16} weight="duotone" />
                 <span>Note: Preprocessing creates a new cleaned file asset on the server. The original source dataset is kept intact.</span>
               </div>
             </div>
           ) : (
             <div className="pipeline-idle-state">
-              <FileSpreadsheet size={48} className="idle-icon" />
+              <FileCsv size={48} weight="duotone" className="idle-icon" />
               <h3>Pipeline Ready</h3>
               <p>Select a dataset and choose an operation on the left panel to begin data cleaning.</p>
             </div>

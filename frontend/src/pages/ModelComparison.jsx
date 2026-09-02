@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-  Scale,
+  Scales,
   ArrowLeft,
-  Loader2,
+  CircleNotch,
   Trophy,
-  BarChart2
-} from "lucide-react";
+  ChartBar
+} from "@phosphor-icons/react";
 import { motion } from "framer-motion";
 import API from "../utils/api";
 import { useToast } from "../components/useToast";
@@ -136,13 +136,13 @@ const ModelComparison = () => {
                   className={`radio-option ${problemType === 'classification' ? 'selected' : ''}`}
                   onClick={() => setProblemType('classification')}
                 >
-                  <BarChart2 size={16} /> Classification
+                  <ChartBar size={16} weight="duotone" /> Classification
                 </div>
                 <div 
                   className={`radio-option ${problemType === 'regression' ? 'selected' : ''}`}
                   onClick={() => setProblemType('regression')}
                 >
-                  <Scale size={16} /> Regression
+                  <Scales size={16} weight="duotone" /> Regression
                 </div>
               </div>
             </div>
@@ -154,12 +154,12 @@ const ModelComparison = () => {
             >
               {loading ? (
                 <>
-                  <Loader2 className="animate-spin" size={18} />
+                  <CircleNotch className="animate-spin" size={18} />
                   Evaluating...
                 </>
               ) : (
                 <>
-                  <Scale size={18} />
+                  <Scales size={18} weight="duotone" />
                   Compare Models
                 </>
               )}
@@ -175,10 +175,10 @@ const ModelComparison = () => {
           {!result && !loading && (
             <div className="idle-display">
               <motion.div
-                animate={{ scale: [1, 1.05, 1], opacity: [0.5, 1, 0.5] }}
+                animate={{ scale: [1, 1.05, 1], opacity: [0.6, 1, 0.6] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
               >
-                <Scale size={56} className="idle-icon" />
+                <Scales size={56} weight="duotone" className="idle-icon text-accent-cyan drop-shadow-[0_0_16px_rgba(0,240,255,0.4)]" />
               </motion.div>
               <h3>Ready to Compare</h3>
               <p>Configure the evaluation parameters on the left and click "Compare Models" to see the leaderboard.</p>
@@ -187,7 +187,7 @@ const ModelComparison = () => {
 
           {loading && (
             <div className="idle-display">
-              <Loader2 size={56} className="idle-icon animate-spin text-accent" />
+              <CircleNotch size={56} className="idle-icon animate-spin text-accent" />
               <h3>Crunching Metrics</h3>
               <p>Loading historical model performances...</p>
             </div>
@@ -205,7 +205,7 @@ const ModelComparison = () => {
               {result.best_model && (
                 <div className="best-model-highlight">
                   <div className="trophy-badge">
-                    <Trophy size={40} />
+                    <Trophy size={40} weight="duotone" />
                   </div>
                   <div className="best-model-title">
                     Best Performing Model
@@ -253,7 +253,7 @@ const ModelComparison = () => {
                             <tr key={model.model_id} className={isBest ? 'is-best-row' : ''}>
                               <td>
                                 {model.model_name}
-                                {isBest && <span className="is-best-badge"><Trophy size={10}/> Best</span>}
+                                {isBest && <span className="is-best-badge"><Trophy size={10} weight="duotone" /> Best</span>}
                               </td>
                               <td>{model.algorithm}</td>
                               {getMetricKeys().map((key) => (

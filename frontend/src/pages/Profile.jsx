@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { User, Mail, ArrowLeft, Loader2, Calendar, Edit2, Save, X } from "lucide-react";
+import { User, Envelope, ArrowLeft, CircleNotch, Calendar, PencilSimple, FloppyDisk, X } from "@phosphor-icons/react";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./Profile.css";
@@ -107,7 +107,7 @@ const Profile = () => {
               </>
             ) : (
               <>
-                <Edit2 size={16} className="text-accent-cyan" />
+                <PencilSimple size={16} weight="duotone" className="text-accent-cyan" />
                 <span className="ml-2">Edit Profile</span>
               </>
             )}
@@ -121,14 +121,14 @@ const Profile = () => {
       <div className="profile-card glass-panel mt-6">
         {loading ? (
           <div className="loading-state">
-            <Loader2 className="animate-spin loading-icon" size={32} />
+            <CircleNotch className="animate-spin loading-icon" size={32} />
             <span>Loading Profile…</span>
           </div>
         ) : userData ? (
           <div className="profile-details-grid">
             <div className="profile-avatar-section">
                <div className="size-24 rounded-full bg-border-glow border border-border-focus flex items-center justify-center text-accent-cyan shadow-[0_0_20px_var(--color-border-glow)] mb-4">
-                 <User size={48} />
+                 <User size={48} weight="duotone" />
                </div>
                <h2>{userData.username}</h2>
                <span className="role-badge">
@@ -141,7 +141,7 @@ const Profile = () => {
               
               <div className="info-row">
                 <div className="info-icon">
-                  <User size={18} />
+                  <User size={18} weight="duotone" />
                 </div>
                 <div className="info-content w-full">
                   <span className="info-label">Username</span>
@@ -151,7 +151,7 @@ const Profile = () => {
 
               <div className="info-row">
                 <div className="info-icon">
-                  <Mail size={18} />
+                  <Envelope size={18} weight="duotone" />
                 </div>
                 <div className="info-content w-full">
                   <span className="info-label">Email Address</span>
@@ -259,7 +259,7 @@ const Profile = () => {
                     onClick={handleSave}
                     disabled={saving}
                   >
-                    {saving ? <Loader2 className="animate-spin" size={16} /> : <Save size={16} />}
+                    {saving ? <CircleNotch className="animate-spin" size={16} /> : <FloppyDisk size={16} weight="duotone" />}
                     {saving ? "Saving..." : "Save Changes"}
                   </button>
                 </div>

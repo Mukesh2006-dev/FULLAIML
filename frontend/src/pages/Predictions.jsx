@@ -2,24 +2,26 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
-  Loader2,
-  BrainCircuit,
-  FileJson,
-  Upload,
-  History,
+  CircleNotch,
+  Brain,
+  FileCode,
+  UploadSimple,
+  ClockCounterClockwise,
   CheckCircle,
-  AlertCircle,
-  Download,
-  Star,
-  LayoutList,
+  WarningCircle,
+  DownloadSimple,
+  List,
   Code,
-  FileCheck,
-} from "lucide-react";
+  FileCsv,
+  Star,
+  Target,
+} from "@phosphor-icons/react";
 import API from "../utils/api";
 import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
 import Papa from "papaparse";
 import useGlobalFileDrop from "../hooks/useGlobalFileDrop";
+import { motion } from "framer-motion";
 import "./Predictions.css";
 
 /* ──────────────────────────────────────────────
@@ -440,7 +442,7 @@ const Predictions = () => {
                 <span className="model-info-target">Target: {selectedModel.target_column}</span>
                 {bestModel && bestModel.id === selectedModel.id && (
                   <span className="best-badge">
-                    <Star size={10} />
+                    <Star size={10} weight="fill" />
                     Best
                   </span>
                 )}
@@ -470,25 +472,30 @@ const Predictions = () => {
               className={`tab-btn ${activeTab === 'single' ? 'active' : ''}`}
               onClick={() => { setActiveTab('single'); setResult(null); setError(null); }}
             >
-              <FileJson size={14} className="inline mr-2" /> Single
+              <FileCode size={14} weight="duotone" className="inline mr-2" /> Single
             </button>
             <button
               className={`tab-btn ${activeTab === 'batch' ? 'active' : ''}`}
               onClick={() => { setActiveTab('batch'); setResult(null); setError(null); }}
             >
-              <Upload size={14} className="inline mr-2" /> Batch
+              <UploadSimple size={14} weight="duotone" className="inline mr-2" /> Batch
             </button>
             <button
               className={`tab-btn ${activeTab === 'history' ? 'active' : ''}`}
               onClick={() => setActiveTab('history')}
             >
-              <History size={14} className="inline mr-2" /> History
+              <ClockCounterClockwise size={14} weight="duotone" className="inline mr-2" /> History
             </button>
           </div>
 
           {!modelId ? (
             <div className="idle-display">
-              <BrainCircuit size={56} className="idle-icon" />
+              <motion.div
+                animate={{ scale: [1, 1.06, 1], opacity: [0.65, 1, 0.65] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Target size={56} weight="duotone" className="idle-icon text-accent-cyan drop-shadow-[0_0_16px_rgba(0,240,255,0.4)]" />
+              </motion.div>
               <h3>Select a Model</h3>
               <p>You need to train and select a model before making predictions.</p>
             </div>
@@ -496,7 +503,7 @@ const Predictions = () => {
             <div className="animate-fade-in-up">
               {error && (
                 <div className="prediction-error-alert">
-                  <AlertCircle size={16} /> {error}
+                  <WarningCircle size={16} weight="duotone" /> {error}
                 </div>
               )}
 
@@ -524,13 +531,13 @@ const Predictions = () => {
                           className={`mode-btn ${inputMode === 'form' ? 'active' : ''}`}
                           onClick={() => setInputMode('form')}
                         >
-                          <LayoutList size={12} /> Form
+                          <List size={12} weight="duotone" /> Form
                         </button>
                         <button
                           className={`mode-btn ${inputMode === 'json' ? 'active' : ''}`}
                           onClick={() => setInputMode('json')}
                         >
-                          <Code size={12} /> JSON
+                          <Code size={12} weight="duotone" /> JSON
                         </button>
                       </div>
 
@@ -569,7 +576,7 @@ const Predictions = () => {
                                 />
                                 {formErrors[col] && (
                                   <span className="field-error">
-                                    <AlertCircle size={11} /> {formErrors[col]}
+                                    <WarningCircle size={11} weight="duotone" /> {formErrors[col]}
                                   </span>
                                 )}
                               </div>
@@ -600,7 +607,7 @@ const Predictions = () => {
                     disabled={loading}
                     style={{ marginTop: '1rem', width: 'auto', padding: '0.75rem 2rem' }}
                   >
-                    {loading ? <Loader2 className="animate-spin" size={18} /> : <BrainCircuit size={18} />}
+                    {loading ? <CircleNotch className="animate-spin" size={18} /> : <Target size={18} weight="duotone" />}
                     {loading ? "Predicting..." : "Predict"}
                   </button>
 
@@ -608,7 +615,7 @@ const Predictions = () => {
                   {result && !loading && result.prediction !== undefined && (
                     <div className="result-box">
                       <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-success)' }}>
-                        <CheckCircle size={18} />
+                        <CheckCircle size={18} weight="duotone" />
                         <strong>Prediction Result</strong>
                       </div>
                       <div className="prediction-value">{String(result.prediction)}</div>
@@ -677,9 +684,9 @@ const Predictions = () => {
                     />
                     {csvFile ? (
                       <>
-                        <FileCheck size={32} className="file-upload-icon" />
+                        <FileCsv size={32} weight="duotone" className="file-upload-icon text-accent-cyan" />
                         <div className="file-name-display">
-                          <CheckCircle size={12} /> {csvFile.name}
+                          <CheckCircle size={12} weight="duotone" /> {csvFile.name}
                         </div>
                         <span className="file-upload-text">
                           {(csvFile.size / 1024).toFixed(1)} KB — Click to change
@@ -687,7 +694,7 @@ const Predictions = () => {
                       </>
                     ) : (
                       <>
-                        <Upload size={32} className="file-upload-icon" />
+                        <UploadSimple size={32} weight="duotone" className="file-upload-icon text-accent-cyan" />
                         <span className="file-upload-text">
                           {isDraggingOverBatch ? (
                             <strong style={{ color: 'var(--accent-cyan)' }}>Drop CSV file anywhere!</strong>
@@ -708,7 +715,7 @@ const Predictions = () => {
                     disabled={loading || !csvFile}
                     style={{ marginTop: '1rem', width: 'auto', padding: '0.75rem 2rem' }}
                   >
-                    {loading ? <Loader2 className="animate-spin" size={18} /> : <Upload size={18} />}
+                    {loading ? <CircleNotch className="animate-spin" size={18} /> : <UploadSimple size={18} weight="duotone" />}
                     {loading ? "Processing Batch..." : "Run Batch Predict"}
                   </button>
 
@@ -717,11 +724,11 @@ const Predictions = () => {
                     <div className="result-box" style={{ marginTop: '2rem' }}>
                       <div className="batch-results-header">
                         <div className="batch-count">
-                          <CheckCircle size={18} />
+                          <CheckCircle size={18} weight="duotone" />
                           <strong>Batch Complete — {result.predictions_generated} rows</strong>
                         </div>
                         <button className="download-csv-btn" onClick={handleDownloadCSV}>
-                          <Download size={14} /> Download CSV
+                          <DownloadSimple size={14} weight="duotone" /> Download CSV
                         </button>
                       </div>
 

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Info, CheckCircle, XCircle, X } from 'lucide-react';
+import { Info, CheckCircle, XCircle, X } from '@phosphor-icons/react';
 import { ToastContext } from './toastContext';
 import './Toast.css';
 
@@ -40,9 +40,9 @@ export const ToastProvider = ({ children }) => {
             <div className="toast-glow" />
             <div className="toast-content">
               <div className="toast-icon">
-                {toast.type === 'success' && <CheckCircle size={18} />}
-                {toast.type === 'error' && <XCircle size={18} />}
-                {toast.type === 'info' && <Info size={18} />}
+                {toast.type === 'success' && <CheckCircle size={18} weight="duotone" />}
+                {toast.type === 'error' && <XCircle size={18} weight="duotone" />}
+                {toast.type === 'info' && <Info size={18} weight="duotone" />}
               </div>
               <div className="toast-text">
                 <span className="toast-title">{toast.title}</span>

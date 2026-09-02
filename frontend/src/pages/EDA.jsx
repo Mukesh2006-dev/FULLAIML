@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-  FileSpreadsheet,
-  Grid,
-  TrendingUp,
-  HelpCircle,
+  FileCsv,
+  SquaresFour,
+  TrendUp,
+  Question,
   ArrowLeft,
-  Loader2,
-  TableProperties
-} from "lucide-react";
+  CircleNotch,
+  Table
+} from "@phosphor-icons/react";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
 import "./EDA.css";
@@ -126,7 +126,7 @@ const Eda = () => {
         <label htmlFor="eda-dataset-select">Active Dataset</label>
         {loadingDatasets ? (
           <div className="loading-dropdown">
-            <Loader2 className="animate-spin" size={16} />
+            <CircleNotch className="animate-spin" size={16} />
             <span>Loading datasets…</span>
           </div>
         ) : (
@@ -148,7 +148,7 @@ const Eda = () => {
 
       {loadingAnalysis && (
         <div className="analysis-loading glass-panel">
-          <Loader2 className="animate-spin loading-icon" size={40} />
+          <CircleNotch className="animate-spin loading-icon" size={40} />
           <h2>Running Analytics Engine…</h2>
           <p>Calculating summaries, dataset insights, distributions, and correlations.</p>
         </div>
@@ -162,28 +162,28 @@ const Eda = () => {
               className={`eda-tab clickable ${activeTab === "overview" ? "active" : ""}`}
               onClick={() => setActiveTab("overview")}
             >
-              <TableProperties size={16} />
+              <Table size={16} weight="duotone" />
               <span>Overview & Insights</span>
             </button>
             <button type="button"
               className={`eda-tab clickable ${activeTab === "summary" ? "active" : ""}`}
               onClick={() => setActiveTab("summary")}
             >
-              <FileSpreadsheet size={16} />
+              <FileCsv size={16} weight="duotone" />
               <span>Numeric Summary</span>
             </button>
             <button type="button"
               className={`eda-tab clickable ${activeTab === "distribution" ? "active" : ""}`}
               onClick={() => setActiveTab("distribution")}
             >
-              <TrendingUp size={16} />
+              <TrendUp size={16} weight="duotone" />
               <span>Column Distributions</span>
             </button>
             <button type="button"
               className={`eda-tab clickable ${activeTab === "correlation" ? "active" : ""}`}
               onClick={() => setActiveTab("correlation")}
             >
-              <Grid size={16} />
+              <SquaresFour size={16} weight="duotone" />
               <span>Correlation Matrix</span>
             </button>
           </div>
@@ -383,7 +383,7 @@ const Eda = () => {
                   </div>
                 ) : (
                   <div className="empty-state glass-panel">
-                    <HelpCircle size={48} className="empty-icon" />
+                    <Question size={48} weight="duotone" className="empty-icon" />
                     <h3>No Numeric Columns</h3>
                     <p>Pearson correlation analysis requires at least two numeric features in your dataset.</p>
                   </div>

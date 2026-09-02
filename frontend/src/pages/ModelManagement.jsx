@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
   ArrowLeft,
-  Loader2,
-  BrainCircuit,
-  Trash2,
+  CircleNotch,
+  Brain,
+  Trash,
   Eye,
-  Crosshair,
-  Boxes,
-  BarChart2,
-  TrendingUp,
-} from "lucide-react";
+  Target,
+  Cube,
+  ChartBar,
+  TrendUp,
+} from "@phosphor-icons/react";
 import API from "../utils/api";
 import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
-import DeleteConfirmModal from "../components/DeleteConfirmModal";
+import { motion } from "framer-motion";
 import "./ModelManagement.css";
 
 const ModelManagement = () => {
@@ -115,17 +115,17 @@ const ModelManagement = () => {
       {/* Stats */}
       <div className="models-stats-bar">
         <div className="model-stat-chip glass-panel">
-          <Boxes size={16} />
+          <Cube size={16} weight="duotone" />
           <span>Total Models:</span>
           <strong>{models.length}</strong>
         </div>
         <div className="model-stat-chip glass-panel">
-          <BarChart2 size={16} />
+          <ChartBar size={16} weight="duotone" />
           <span>Classification:</span>
           <strong>{classificationCount}</strong>
         </div>
         <div className="model-stat-chip glass-panel">
-          <TrendingUp size={16} />
+          <TrendUp size={16} weight="duotone" />
           <span>Regression:</span>
           <strong>{regressionCount}</strong>
         </div>
@@ -160,12 +160,17 @@ const ModelManagement = () => {
       {/* Content */}
       {loading ? (
         <div className="models-loading">
-          <Loader2 className="animate-spin" size={40} />
+          <CircleNotch className="animate-spin" size={40} />
           <span>Loading models…</span>
         </div>
       ) : filteredModels.length === 0 ? (
         <div className="models-empty-state glass-panel">
-          <BrainCircuit size={56} />
+          <motion.div
+            animate={{ scale: [1, 1.06, 1], opacity: [0.65, 1, 0.65] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <Cube size={56} weight="duotone" className="text-accent-cyan drop-shadow-[0_0_16px_rgba(0,240,255,0.4)]" />
+          </motion.div>
           <h3>{models.length === 0 ? "No Models Trained Yet" : "No Models Match Filters"}</h3>
           <p>
             {models.length === 0
@@ -196,7 +201,7 @@ const ModelManagement = () => {
                     <tr key={model.id}>
                       <td>
                         <div className="model-name-cell">
-                          <BrainCircuit size={14} />
+                          <Brain size={14} weight="duotone" />
                           <span title={model.model_name}>{model.model_name}</span>
                         </div>
                       </td>
@@ -229,7 +234,7 @@ const ModelManagement = () => {
                             title="Make Predictions"
                             onClick={() => navigate(`/predictions`)}
                           >
-                            <Crosshair size={14} />
+                            <Target size={14} weight="duotone" />
                           </button>
                           <button
                             className="model-action-btn clickable"
@@ -240,14 +245,14 @@ const ModelManagement = () => {
                               )
                             }
                           >
-                            <Eye size={14} />
+                            <Eye size={14} weight="duotone" />
                           </button>
                           <button
                             className="model-action-btn danger clickable"
                             title="Delete Model"
                             onClick={() => setDeleteTarget(model)}
                           >
-                            <Trash2 size={14} />
+                            <Trash size={14} weight="duotone" />
                           </button>
                         </div>
                       </td>
@@ -286,8 +291,9 @@ const ModelManagement = () => {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <Trash2
+            <Trash
               size={40}
+              weight="duotone"
               style={{ color: "var(--text-danger)", marginBottom: "1rem" }}
             />
             <h3
@@ -341,12 +347,12 @@ const ModelManagement = () => {
               >
                 {deleting ? (
                   <>
-                    <Loader2 className="animate-spin" size={14} />
+                    <CircleNotch className="animate-spin" size={14} />
                     Deleting…
                   </>
                 ) : (
                   <>
-                    <Trash2 size={14} />
+                    <Trash size={14} weight="duotone" />
                     Delete
                   </>
                 )}

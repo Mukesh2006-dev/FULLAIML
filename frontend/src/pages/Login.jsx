@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Database, Lock, Mail, ArrowRight } from "lucide-react";
+import { Database, Lock, Envelope, ArrowRight } from "@phosphor-icons/react";
 import { useGoogleLogin } from "@react-oauth/google";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
@@ -103,7 +103,7 @@ const Login = () => {
       <div className="login-card glass-panel">
         <div className="login-header">
           <div className="login-logo">
-            <Database size={32} />
+            <Database size={32} weight="duotone" />
           </div>
           <h1>Welcome Back</h1>
           <p>Sign in to manage datasets &amp; run machine learning models</p>
@@ -116,7 +116,7 @@ const Login = () => {
           <div className="input-group">
             <label htmlFor="email">Email Address</label>
             <div className="input-wrapper">
-              <Mail className="input-icon" size={18} />
+              <Envelope className="input-icon" size={18} weight="duotone" />
               <input
                 id="email"
                 type="email"
@@ -132,7 +132,7 @@ const Login = () => {
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <div className="input-wrapper">
-              <Lock className="input-icon" size={18} />
+              <Lock className="input-icon" size={18} weight="duotone" />
               <input
                 id="password"
                 type="password"

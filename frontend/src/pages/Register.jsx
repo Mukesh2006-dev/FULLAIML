@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Database, Lock, Mail, User, ArrowRight, Check, X } from "lucide-react";
+import { Database, Lock, Envelope, User, ArrowRight, Check, X } from "@phosphor-icons/react";
 import { useGoogleLogin } from "@react-oauth/google";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
@@ -182,7 +182,7 @@ const Register = () => {
           <div className="input-group">
             <label htmlFor="email">Email Address</label>
             <div className="input-wrapper">
-              <Mail className="input-icon" size={18} />
+              <Envelope className="input-icon" size={18} weight="duotone" />
               <input
                 id="email"
                 type="email"
