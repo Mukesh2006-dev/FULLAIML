@@ -19,6 +19,7 @@ import API from "../utils/api";
 import { useToast } from "../components/useToast";
 import { safeApiCall } from "../utils/asyncHandler";
 import Papa from "papaparse";
+import useGlobalFileDrop from "../hooks/useGlobalFileDrop";
 import "./Predictions.css";
 
 /* ──────────────────────────────────────────────
@@ -124,6 +125,23 @@ const Predictions = () => {
   const [error, setError] = useState(null);
   const [history, setHistory] = useState([]);
   const [batchShowAll, setBatchShowAll] = useState(false);
+
+  const handleBatchDrop = useCallback((droppedFile, dropError) => {
+    if (dropError) {
+      setError(dropError);
+      setCsvFile(null);
+      return;
+    }
+    if (droppedFile) {
+      setCsvFile(droppedFile);
+      setError(null);
+    }
+  }, []);
+
+  const isDraggingOverBatch = useGlobalFileDrop(handleBatchDrop, {
+    enabled: activeTab === "batch",
+    acceptExtension: ".csv",
+  });
 
   // Best model
   const bestModel = useMemo(() => findBestModel(models), [models]);
@@ -645,13 +663,23 @@ const Predictions = () => {
               {/* ═══ BATCH TAB ═══ */}
               {activeTab === 'batch' && (
                 <div>
+                  {isDraggingOverBatch && (
+                    <div className="global-drag-overlay">
+                      <div className="global-drag-content">
+                        <Upload size={48} className="global-drag-icon" />
+                        <h3>Drop batch CSV file anywhere</h3>
+                        <p>Release to select this file for batch prediction</p>
+                      </div>
+                    </div>
+                  )}
+
                   <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Upload Batch CSV</h3>
                   <p className="card-desc" style={{ marginBottom: '1rem' }}>
                     Upload a CSV file containing rows of features to generate bulk predictions.
                   </p>
 
                   {/* Styled file upload area */}
-                  <div className={`file-upload-area ${csvFile ? 'has-file' : ''}`}>
+                  <div className={`file-upload-area ${csvFile ? 'has-file' : ''} ${isDraggingOverBatch ? 'is-dragging-over' : ''}`}>
                     <input
                       type="file"
                       accept=".csv"
@@ -671,7 +699,13 @@ const Predictions = () => {
                       <>
                         <Upload size={32} className="file-upload-icon" />
                         <span className="file-upload-text">
-                          <strong>Click to upload</strong> or drag & drop a CSV file
+                          {isDraggingOverBatch ? (
+                            <strong style={{ color: 'var(--accent-cyan)' }}>Drop CSV file anywhere!</strong>
+                          ) : (
+                            <>
+                              <strong>Click to upload</strong> or drag & drop a CSV file
+                            </>
+                          )}
                         </span>
                         <span className="file-upload-text">.csv files only</span>
                       </>

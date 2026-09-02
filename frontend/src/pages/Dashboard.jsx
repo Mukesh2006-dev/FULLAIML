@@ -15,6 +15,7 @@ import {
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
+import useGlobalFileDrop from "../hooks/useGlobalFileDrop";
 import "./Dashboard.css";
 
 const Dashboard = () => {
@@ -74,10 +75,14 @@ const Dashboard = () => {
     fetchDatasets();
   }, [fetchDatasets]);
 
-  const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
+  const processSelectedFile = useCallback((selectedFile, dropError) => {
+    if (dropError) {
+      setError(dropError);
+      setFile(null);
+      return;
+    }
     if (selectedFile) {
-      if (!selectedFile.name.endsWith(".csv")) {
+      if (!selectedFile.name.toLowerCase().endsWith(".csv")) {
         setError("Only CSV files are allowed.");
         setFile(null);
         return;
@@ -94,6 +99,15 @@ const Dashboard = () => {
       setFile(selectedFile);
       setError("");
     }
+  }, []);
+
+  const isDraggingOver = useGlobalFileDrop(processSelectedFile, {
+    acceptExtension: ".csv",
+  });
+
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    processSelectedFile(selectedFile);
   };
 
   const handleUploadSubmit = async (e) => {
@@ -242,6 +256,16 @@ const Dashboard = () => {
         </div>
       )}
 
+      {isDraggingOver && (
+        <div className="global-drag-overlay">
+          <div className="global-drag-content">
+            <Upload size={48} className="global-drag-icon" />
+            <h3>Drop CSV file anywhere</h3>
+            <p>Release to select this file for dataset upload</p>
+          </div>
+        </div>
+      )}
+
       <div className="dashboard-grid">
         {/* Upload Card */}
         <div className="dashboard-card glass-panel upload-card">
@@ -249,7 +273,7 @@ const Dashboard = () => {
           <p className="card-desc">Upload a CSV file containing your structured dataset (max 50MB)</p>
           
           <form className="upload-form" onSubmit={handleUploadSubmit}>
-            <div className="drag-drop-zone">
+            <div className={`drag-drop-zone ${isDraggingOver ? "is-dragging-over" : ""}`}>
               <Upload className="upload-icon" size={40} />
               <input
                 id="csv-file-input"
@@ -259,9 +283,16 @@ const Dashboard = () => {
                 aria-label="Upload CSV file"
               />
               <span className="file-name-label">
-                {file ? file.name : "Select or drag CSV file"}
+                {file
+                  ? file.name
+                  : isDraggingOver
+                  ? "Drop CSV file anywhere!"
+                  : "Select or drag CSV file"}
               </span>
               {file && <span className="file-size">{formatBytes(file.size)}</span>}
+              {isDraggingOver && (
+                <span className="drag-glow-hint">Drop anywhere to select file</span>
+              )}
             </div>
 
             <button

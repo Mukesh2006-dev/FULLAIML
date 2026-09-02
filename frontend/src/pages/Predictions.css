@@ -815,6 +815,17 @@
   background: rgba(0, 240, 255, 0.02);
 }
 
+.file-upload-area.is-dragging-over {
+  border-color: var(--accent-cyan) !important;
+  background: rgba(0, 240, 255, 0.08) !important;
+  box-shadow: 
+    0 0 35px rgba(0, 240, 255, 0.45),
+    0 0 70px rgba(0, 240, 255, 0.2),
+    inset 0 0 45px rgba(0, 240, 255, 0.15) !important;
+  animation: dropZonePulse 1.2s ease-in-out infinite alternate !important;
+  transform: scale(1.02);
+}
+
 .file-upload-area.has-file {
   border-color: var(--border-success);
   background: rgba(16, 185, 129, 0.03);

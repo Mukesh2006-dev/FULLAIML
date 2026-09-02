@@ -120,6 +120,118 @@
   box-shadow: inset 0 0 40px rgba(0, 240, 255, 0.03);
 }
 
+/* ── Glowing Drag & Drop Zone when dragging over screen ── */
+.drag-drop-zone.is-dragging-over {
+  border-color: var(--accent-cyan) !important;
+  background: rgba(0, 240, 255, 0.08) !important;
+  box-shadow: 
+    0 0 35px rgba(0, 240, 255, 0.45),
+    0 0 70px rgba(0, 240, 255, 0.2),
+    inset 0 0 50px rgba(0, 240, 255, 0.15) !important;
+  animation: dropZonePulse 1.2s ease-in-out infinite alternate !important;
+  transform: scale(1.02);
+  z-index: 10;
+}
+
+@keyframes dropZonePulse {
+  0% {
+    box-shadow: 
+      0 0 25px rgba(0, 240, 255, 0.35),
+      0 0 50px rgba(0, 240, 255, 0.15),
+      inset 0 0 35px rgba(0, 240, 255, 0.1);
+    border-color: var(--accent-cyan);
+  }
+  100% {
+    box-shadow: 
+      0 0 55px rgba(0, 240, 255, 0.7),
+      0 0 90px rgba(0, 240, 255, 0.35),
+      inset 0 0 65px rgba(0, 240, 255, 0.25);
+    border-color: #80f9ff;
+  }
+}
+
+.drag-drop-zone.is-dragging-over .upload-icon {
+  color: var(--accent-cyan) !important;
+  transform: translateY(-8px) scale(1.25);
+  filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.9)) !important;
+}
+
+.drag-drop-zone.is-dragging-over .file-name-label {
+  color: var(--accent-cyan) !important;
+  text-shadow: 0 0 16px rgba(0, 240, 255, 0.7);
+  font-weight: 700;
+  font-size: 0.98rem;
+}
+
+.drag-glow-hint {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--accent-cyan);
+  margin-top: 0.5rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  animation: pulse 1s infinite alternate;
+}
+
+/* ── Screen-Wide Drag Overlay ── */
+.global-drag-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(4, 8, 20, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 3px dashed var(--accent-cyan);
+  box-shadow: inset 0 0 100px rgba(0, 240, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.global-drag-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 4rem;
+  background: rgba(12, 16, 32, 0.9);
+  border: 1px solid var(--accent-cyan);
+  border-radius: var(--radius-lg);
+  box-shadow: 
+    0 0 60px rgba(0, 240, 255, 0.4),
+    inset 0 0 40px rgba(0, 240, 255, 0.15);
+  text-align: center;
+}
+
+.global-drag-content h3 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-shadow: 0 0 20px rgba(0, 240, 255, 0.7);
+  margin: 0;
+}
+
+.global-drag-content p {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.global-drag-icon {
+  color: var(--accent-cyan);
+  filter: drop-shadow(0 0 24px rgba(0, 240, 255, 0.9));
+  animation: floatBounce 1.5s infinite ease-in-out;
+}
+
+@keyframes floatBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
 .drag-drop-zone input {
   position: absolute;
   top: 0;
