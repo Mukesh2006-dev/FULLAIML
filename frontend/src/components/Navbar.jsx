@@ -1,29 +1,31 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-  LayoutDashboard,
-  Sparkles,
-  SearchCode,
-  LineChart,
-  BrainCircuit,
-  LogOut,
+  SquaresFour,
+  Sparkle,
+  Code,
+  ChartLineUp,
+  Brain,
+  Scales,
+  Cube,
+  Target,
   Database,
   User,
-  Settings,
-  Scale
-} from "lucide-react";
+  Gear,
+  SignOut,
+} from "@phosphor-icons/react";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
 
 const NAV_ITEMS = [
-  { path: "/dashboard", label: "Dashboard" },
-  { path: "/preprocessing", label: "Preprocessing" },
-  { path: "/eda", label: "Automated EDA" },
-  { path: "/visualizations", label: "Visualizations" },
-  { path: "/ml-model", label: "Model Training" },
-  { path: "/ml-comparison", label: "Compare Models" },
-  { path: "/models", label: "Models" },
-  { path: "/predictions", label: "Predictions" },
+  { path: "/dashboard", label: "Dashboard", icon: SquaresFour },
+  { path: "/preprocessing", label: "Preprocessing", icon: Sparkle },
+  { path: "/eda", label: "Automated EDA", icon: Code },
+  { path: "/visualizations", label: "Visualizations", icon: ChartLineUp },
+  { path: "/ml-model", label: "Model Training", icon: Brain },
+  { path: "/ml-comparison", label: "Compare Models", icon: Scales },
+  { path: "/models", label: "Models", icon: Cube },
+  { path: "/predictions", label: "Predictions", icon: Target },
 ];
 
 const Navbar = () => {
@@ -133,7 +135,7 @@ const Navbar = () => {
           className="flex items-center gap-2 px-3 py-1.5 rounded-full cursor-pointer transition-all duration-300 relative bg-transparent hover:bg-white/5 active:scale-95"
           onClick={() => navigate("/dashboard")}
         >
-          <Database className="text-text-primary shrink-0" size={20} />
+          <Database className="text-accent-cyan shrink-0 drop-shadow-[0_0_6px_rgba(0,255,230,0.4)]" size={22} weight="duotone" />
           <span className="font-sans text-[1.05rem] font-bold text-text-primary tracking-tight whitespace-nowrap">
             FullAIML
           </span>
@@ -158,22 +160,23 @@ const Navbar = () => {
               <Link
                 to={item.path}
                 ref={(el) => (linkRefs.current[index] = el)}
-                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full font-sans text-sm font-medium transition-colors duration-300 whitespace-nowrap no-underline border-none bg-transparent z-10 ${
+                className={`relative flex items-center gap-1.5 px-3 py-2 rounded-full font-sans text-sm font-medium transition-colors duration-300 whitespace-nowrap no-underline border-none bg-transparent z-10 group ${
                   isActive ? "text-text-primary" : "text-white/60 hover:text-text-primary"
                 } max-lg:px-2.5 max-sm:px-2 max-sm:text-xs`}
               >
-                <span className="max-sm:hidden max-lg:hidden">{item.label}</span>
-                {/* Fallback icons for mobile since text is hidden */}
-                <span className="lg:hidden">
-                  {index === 0 && <LayoutDashboard size={18} />}
-                  {index === 1 && <Sparkles size={18} />}
-                  {index === 2 && <SearchCode size={18} />}
-                  {index === 3 && <LineChart size={18} />}
-                  {index === 4 && <BrainCircuit size={18} />}
-                  {index === 5 && <Scale size={18} />}
-                  {index === 6 && <BrainCircuit size={18} />}
-                  {index === 7 && <BrainCircuit size={18} />}
+                {/* Fallback icons for mobile/dock since text is hidden */}
+                <span className="lg:hidden flex items-center justify-center">
+                  <item.icon
+                    size={18}
+                    weight={isActive ? "duotone" : "regular"}
+                    className={`shrink-0 transition-all duration-300 ${
+                      isActive
+                        ? "text-accent-cyan drop-shadow-[0_0_8px_rgba(0,255,230,0.6)]"
+                        : "text-white/60 group-hover:text-white/90"
+                    }`}
+                  />
                 </span>
+                <span className="max-lg:hidden">{item.label}</span>
               </Link>
             </li>
           );
@@ -193,7 +196,7 @@ const Navbar = () => {
             }`}
             onClick={() => setProfileOpen((prev) => !prev)}
           >
-            <User size={16} />
+            <User size={18} weight={profileOpen ? "duotone" : "regular"} />
             {profileOpen && (
               <span className="absolute -inset-[3px] rounded-full border-[1.5px] border-border-focus animate-[profileRingPulse_1.5s_ease-in-out_infinite]" />
             )}
@@ -210,7 +213,7 @@ const Navbar = () => {
 
             <div className="flex items-center gap-3 px-3 py-2.5 rounded-sm">
               <div className="size-9 rounded-full bg-border-glow border border-border-focus flex items-center justify-center text-accent-cyan shrink-0 shadow-[0_0_10px_var(--color-border-glow)]">
-                <User size={18} />
+                <User size={18} weight="duotone" />
               </div>
               <div className="flex flex-col gap-0.5 min-w-0">
                 <span className="font-display text-[0.85rem] font-bold text-text-primary whitespace-nowrap overflow-hidden text-ellipsis">
@@ -232,7 +235,7 @@ const Navbar = () => {
               }}
               className="flex items-center gap-2.5 w-full px-3 py-2 border-none rounded-sm bg-transparent text-white/60 font-mono text-[0.75rem] font-medium cursor-pointer transition-colors text-left tracking-wide hover:bg-white/5 hover:text-white active:scale-95"
             >
-              <Settings size={14} className="shrink-0 transition-all" />
+              <Gear size={15} weight="duotone" className="shrink-0 transition-all text-accent-cyan" />
               <span>Profile</span>
             </button>
 
@@ -241,7 +244,7 @@ const Navbar = () => {
               onClick={handleLogout}
               className="flex items-center gap-2.5 w-full px-3 py-2 border-none rounded-sm bg-transparent text-white/60 font-mono text-[0.75rem] font-medium cursor-pointer transition-colors text-left tracking-wide hover:bg-red-500/10 hover:text-red-400 hover:[&>svg]:text-red-400 hover:[&>svg]:drop-shadow-[0_0_6px_rgba(239,68,68,0.3)] active:scale-95"
             >
-              <LogOut size={14} className="shrink-0 transition-all" />
+              <SignOut size={15} weight="duotone" className="shrink-0 transition-all" />
               <span>Log Out</span>
             </button>
           </div>

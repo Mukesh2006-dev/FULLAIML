@@ -1,17 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Upload,
-  Trash2,
-  Sparkles,
-  SearchCode,
-  LineChart,
-  BrainCircuit,
-  FileSpreadsheet,
-  AlertCircle,
-  Loader2,
-  Crosshair
-} from "lucide-react";
+  Sparkle,
+  Code,
+  ChartLineUp,
+  Brain,
+  FileCsv,
+  WarningCircle,
+  CircleNotch,
+  Target,
+  Trash,
+  CheckCircle,
+} from "@phosphor-icons/react";
+import LordIcon from "../components/LordIcon";
 import API from "../utils/api";
 import { safeApiCall } from "../utils/asyncHandler";
 import DeleteConfirmModal from "../components/DeleteConfirmModal";
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [profileIncomplete, setProfileIncomplete] = useState(false);
@@ -117,6 +119,7 @@ const Dashboard = () => {
     setError("");
     setSuccess("");
     setUploading(true);
+    setUploadProgress(0);
 
     const formData = new FormData();
     formData.append("file", file);
@@ -125,8 +128,19 @@ const Dashboard = () => {
       headers: {
         "Content-Type": "multipart/form-data",
       },
+      onUploadProgress: (progressEvent) => {
+        if (progressEvent.total) {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          setUploadProgress(percentCompleted);
+        }
+      },
     }));
     
+    setUploading(false);
+    setUploadProgress(0);
+
     if (err) {
       setError(err.response?.data?.detail || "Failed to upload file.");
     } else {
@@ -138,7 +152,6 @@ const Dashboard = () => {
        
       fetchDatasets();
     }
-    setUploading(false);
   };
 
   // Open the delete confirmation modal
@@ -216,7 +229,7 @@ const Dashboard = () => {
           <div className="profile-toast-glow" />
           <div className="profile-toast-content">
             <div className="profile-toast-icon">
-              <AlertCircle size={24} />
+              <WarningCircle size={24} weight="duotone" />
             </div>
             <div className="profile-toast-text">
               <span className="profile-toast-title">Profile Incomplete</span>
@@ -244,25 +257,15 @@ const Dashboard = () => {
 
       {error && (
         <div className="dashboard-alert error-bg">
-          <AlertCircle size={20} />
+          <WarningCircle size={20} weight="duotone" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
         <div className="dashboard-alert success-bg">
-          <Sparkles size={20} />
+          <CheckCircle size={20} weight="duotone" />
           <span>{success}</span>
-        </div>
-      )}
-
-      {isDraggingOver && (
-        <div className="global-drag-overlay">
-          <div className="global-drag-content">
-            <Upload size={48} className="global-drag-icon" />
-            <h3>Drop CSV file anywhere</h3>
-            <p>Release to select this file for dataset upload</p>
-          </div>
         </div>
       )}
 
@@ -274,16 +277,25 @@ const Dashboard = () => {
           
           <form className="upload-form" onSubmit={handleUploadSubmit}>
             <div className={`drag-drop-zone ${isDraggingOver ? "is-dragging-over" : ""}`}>
-              <Upload className="upload-icon" size={40} />
+              <LordIcon
+                src="https://cdn.lordicon.com/smwmetfi.json"
+                trigger={isDraggingOver ? "loop" : "hover"}
+                size={48}
+                colors="primary:#00ffe6,secondary:#8b5cf6"
+                className="upload-icon"
+              />
               <input
                 id="csv-file-input"
                 type="file"
                 accept=".csv"
                 onChange={handleFileChange}
+                disabled={uploading}
                 aria-label="Upload CSV file"
               />
               <span className="file-name-label">
-                {file
+                {uploading
+                  ? `Uploading ${file?.name || "file"} (${uploadProgress}%)`
+                  : file
                   ? file.name
                   : isDraggingOver
                   ? "Drop CSV file anywhere!"
@@ -295,6 +307,21 @@ const Dashboard = () => {
               )}
             </div>
 
+            {uploading && (
+              <div className="upload-progress-container">
+                <div className="upload-progress-header">
+                  <span className="upload-progress-label">Uploading to server</span>
+                  <span className="upload-progress-val">{uploadProgress}%</span>
+                </div>
+                <div className="upload-progress-bar-bg">
+                  <div
+                    className="upload-progress-bar-fill"
+                    style={{ width: `${uploadProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
             <button
               type="submit"
               className="upload-btn clickable"
@@ -302,8 +329,8 @@ const Dashboard = () => {
             >
               {uploading ? (
                 <>
-                  <Loader2 className="animate-spin" size={18} />
-                  Uploading…
+                  <CircleNotch className="animate-spin" size={18} />
+                  <span>Uploading… {uploadProgress}%</span>
                 </>
               ) : (
                 "Upload File"
@@ -319,12 +346,18 @@ const Dashboard = () => {
 
           {loading ? (
             <div className="loading-state">
-              <Loader2 className="animate-spin loading-icon" size={32} />
+              <CircleNotch className="animate-spin loading-icon" size={32} />
               <span>Fetching datasets…</span>
             </div>
           ) : datasets.length === 0 ? (
             <div className="empty-state">
-              <FileSpreadsheet size={48} className="empty-icon" />
+              <LordIcon
+                src="https://cdn.lordicon.com/xulqnnzg.json"
+                trigger="hover"
+                size={56}
+                colors="primary:#00ffe6,secondary:#8b5cf6"
+                className="empty-icon"
+              />
               <h3>No Datasets Found</h3>
               <p>Upload your first CSV dataset using the upload panel to get started.</p>
             </div>
@@ -344,7 +377,7 @@ const Dashboard = () => {
                   {datasets.map((dataset) => (
                     <tr key={dataset.id}>
                       <td className="dataset-name-cell">
-                        <FileSpreadsheet size={16} className="table-doc-icon" />
+                        <FileCsv size={18} weight="duotone" className="table-doc-icon text-accent-cyan" />
                         <span title={dataset.filename}>{dataset.filename}</span>
                       </td>
                       <td>{formatBytes(dataset.file_size)}</td>
@@ -356,42 +389,42 @@ const Dashboard = () => {
                           onClick={() => navigate(`/preprocessing?dataset_id=${dataset.id}`)}
                           title="Preprocess & Clean"
                         >
-                          <Sparkles size={16} className="preprocess-ico" />
+                          <Sparkle size={17} weight="duotone" className="preprocess-ico" />
                         </button>
                         <button type="button"
                           className="action-btn clickable"
                           onClick={() => navigate(`/eda?dataset_id=${dataset.id}`)}
                           title="Run automated EDA"
                         >
-                          <SearchCode size={16} className="eda-ico" />
+                          <Code size={17} weight="duotone" className="eda-ico" />
                         </button>
                         <button type="button"
                           className="action-btn clickable"
                           onClick={() => navigate(`/visualizations?dataset_id=${dataset.id}`)}
                           title="Visualizations"
                         >
-                          <LineChart size={16} className="chart-ico" />
+                          <ChartLineUp size={17} weight="duotone" className="chart-ico" />
                         </button>
                         <button type="button"
                           className="action-btn clickable"
                           onClick={() => navigate(`/ml-model?dataset_id=${dataset.id}`)}
                           title="Train ML Model"
                         >
-                          <BrainCircuit size={16} className="train-ico" />
+                          <Brain size={17} weight="duotone" className="train-ico" />
                         </button>
                         <button type="button"
                           className="action-btn clickable"
                           onClick={() => navigate(`/predictions`)}
                           title="Predictions"
                         >
-                          <Crosshair size={16} className="predict-ico" />
+                          <Target size={17} weight="duotone" className="predict-ico" />
                         </button>
                         <button type="button"
                           className="action-btn clickable delete-btn"
                           onClick={() => handleDeleteClick(dataset)}
                           title="Delete Dataset"
                         >
-                          <Trash2 size={16} />
+                          <Trash size={17} weight="duotone" />
                         </button>
                       </td>
                     </tr>

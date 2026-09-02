@@ -663,16 +663,6 @@ const Predictions = () => {
               {/* ═══ BATCH TAB ═══ */}
               {activeTab === 'batch' && (
                 <div>
-                  {isDraggingOverBatch && (
-                    <div className="global-drag-overlay">
-                      <div className="global-drag-content">
-                        <Upload size={48} className="global-drag-icon" />
-                        <h3>Drop batch CSV file anywhere</h3>
-                        <p>Release to select this file for batch prediction</p>
-                      </div>
-                    </div>
-                  )}
-
                   <h3 style={{ marginBottom: '0.5rem', fontSize: '1rem' }}>Upload Batch CSV</h3>
                   <p className="card-desc" style={{ marginBottom: '1rem' }}>
                     Upload a CSV file containing rows of features to generate bulk predictions.
